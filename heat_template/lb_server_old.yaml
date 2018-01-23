@@ -1,0 +1,39 @@
+description: A load-balancer server
+heat_template_version: '2015-10-15'
+parameters:
+  flavor: {default: 'flavorid', description: flavor used by the servers, type: string}
+  image: {default: image_id, description: Image used for
+      servers, type: string}
+  metadata:
+    default: {}
+    type: json
+  network: {default: net_id, description: Network used
+      by the server, type: string}
+  password: {default: passwd, description: SSH password, hidden: true, type: string}
+  security_groups: {default: secGroup_id, description: Security
+      groups for server, type: string}
+resources:
+  cloud_config:
+    properties:
+      cloud_config:
+        chpasswd: {expire: 'False'}
+        manage_etc_hosts: 'False'
+        password: {get_param: password}
+        ssh_pwauth: 'True'
+    type: OS::Heat::CloudConfig
+  server:
+    properties:
+      flavor: {get_param: flavor}
+      image: {get_param: image}
+      metadata: {get_param: metadata}
+      networks:
+      - port: {get_resource: server_port}
+      user_data: {get_resource: cloud_config}
+      user_data_format: RAW
+    type: OS::Nova::Server
+  server_port:
+    properties:
+      network: {get_param: network}
+      security_groups:
+      - {get_param: security_groups}
+    type: OS::Neutron::Port

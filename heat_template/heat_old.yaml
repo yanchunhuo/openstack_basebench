@@ -1,0 +1,97 @@
+description: '{''nested_template'': {''heat_template_version'': ''2015-10-15'', ''description'':
+  ''A load-balancer server'', ''parameters'': {''network'': {''default'': ''net_id'',
+  ''type'': ''string'', ''description'': ''Network used by the server''}, ''image'':
+  {''default'': ''image_id'', ''type'': ''string'', ''description'':
+  ''Image used for servers''}, ''flavor'': {''default'': ''flavorid'', ''type'': ''string'',
+  ''description'': ''flavor used by the servers''}, ''password'': {''default'': ''passwd'',
+  ''hidden'': True, ''type'': ''string'', ''description'': ''SSH password''}, ''security_groups'':
+  {''default'': ''secGroup_id'', ''type'': ''string'', ''description'':
+  ''Security groups for server''}, ''metadata'': {''default'': {}, ''type'': ''json''}},
+  ''resources'': {''cloud_config'': {''type'': ''OS::Heat::CloudConfig'', ''properties'':
+  {''cloud_config'': {''password'': {''get_param'': ''password''}, ''manage_etc_hosts'':
+  ''False'', ''ssh_pwauth'': ''True'', ''chpasswd'': {''expire'': ''False''}}}}, ''server_port'':
+  {''type'': ''OS::Neutron::Port'', ''properties'': {''network'': {''get_param'':
+  ''network''}, ''security_groups'': [{''get_param'': ''security_groups''}]}}, ''server'':
+  {''type'': ''OS::Nova::Server'', ''properties'': {''user_data_format'': ''RAW'',
+  ''image'': {''get_param'': ''image''}, ''user_data'': {''get_resource'': ''cloud_config''},
+  ''flavor'': {''get_param'': ''flavor''}, ''networks'': [{''port'': {''get_resource'':
+  ''server_port''}}], ''metadata'': {''get_param'': ''metadata''}}}}}, ''context'':
+  {''sg_name'': u''default'', ''network'': u''net_id'',
+  ''availability_zone'': u'''', ''stack_name'': u'''', ''image'': u''image_id'',
+  ''vm_max_num'': max_computes, ''vm_min_num'': min_computes, ''stack_access'': u''stack_admin_pass'', ''source_type'':
+  u''image_id'', ''net_type'': u''heat_network'', ''net_name'': u''ip net_CIDR'',
+  ''groups'': u''secGroup_id'', ''img_name'': u''images_name'',
+  ''flavor'': u''flavor_type_name'', ''flavor_id'': u''flavorid'', ''stack_admin_pass'': u''passwd'',
+  ''alarm_rules'': {''meter_item'': u''alarm_type'', ''evaluation_periods'': u''1'',
+  ''period'': u''300'', ''scale_up'': {''threshold'': max_alarmvalue, ''offset'': 1}, ''scale_dn'':
+  {''threshold'': min_alarmvalue, ''offset'': 1}, ''statistic'': u''avg'', ''alarm_action'': u'''',
+  ''cooling_time'': 300}, ''cooling_time'': 300}}'
+heat_template_version: '2015-10-15'
+outputs:
+  current_size:
+    description: This is the current size of the auto scaling group.
+    value:
+      get_attr: [asg, current_size]
+resources:
+  CPU-scale_dn-alarm-1512618509763:
+    properties:
+      alarm_actions:
+      - get_attr: [policy_dn_n, alarm_url]
+      comparison_operator: lt
+      description: '{''meter_item'': u''alarm_type'', ''evaluation_periods'': u''1'',
+        ''statistic'': u''avg'', ''period'': u''300'', ''policy_name'': ''policy_dn_n'',
+        ''created_time'': ''2017-12-07 11:48:29'', ''offset'': 1, ''threshold'': min_alarmvalue,
+        ''alarm_action'': u'''', ''cooling_time'': 300}'
+      enabled: true
+      evaluation_periods: '1'
+      matching_metadata:
+        metadata.user_metadata.stack: {get_param: 'OS::stack_id'}
+      meter_name: alarm_type
+      period: '300'
+      statistic: avg
+      threshold: min_alarmvalue
+    type: OS::Ceilometer::Alarm
+  CPU-scale_up-alarm-1512618509762:
+    properties:
+      alarm_actions:
+      - get_attr: [policy_up_s, alarm_url]
+      comparison_operator: gt
+      description: '{''meter_item'': u''alarm_type'', ''evaluation_periods'': u''1'',
+        ''statistic'': u''avg'', ''period'': u''300'', ''policy_name'': ''policy_up_s'',
+        ''created_time'': ''2017-12-07 11:48:29'', ''offset'': 1, ''threshold'': max_alarmvalue,
+        ''alarm_action'': u'''', ''cooling_time'': 300}'
+      enabled: true
+      evaluation_periods: '1'
+      matching_metadata:
+        metadata.user_metadata.stack: {get_param: 'OS::stack_id'}
+      meter_name: alarm_type
+      period: '300'
+      statistic: avg
+      threshold: max_alarmvalue
+    type: OS::Ceilometer::Alarm
+  asg:
+    properties:
+      max_size: max_computes
+      min_size: min_computes
+      resource:
+        properties:
+          metadata:
+            metering.stack: {get_param: 'OS::stack_id'}
+        type: lb_server.yaml
+    type: OS::Heat::AutoScalingGroup
+  policy_dn_n:
+    properties:
+      adjustment_type: change_in_capacity
+      auto_scaling_group_id: {get_resource: asg}
+      cooldown: '300'
+      scaling_adjustment: -1
+    type: OS::Heat::ScalingPolicy
+  policy_up_s:
+    properties:
+      adjustment_type: change_in_capacity
+      auto_scaling_group_id: {get_resource: asg}
+      cooldown: 300
+      scaling_adjustment: 1
+    type: OS::Heat::ScalingPolicy
+
+
