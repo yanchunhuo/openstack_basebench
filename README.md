@@ -10,7 +10,7 @@
 * pip install paramiko==2.4.0
 
 ### 3、下载测试代码
-* git clone http://123.58.0.124:9091/baiwucloud/basebench.git
+* git clone https://github.com/yanchunhuo/basebench.git 
 
 ## 二、开始测试
 ### 1、修改配置
