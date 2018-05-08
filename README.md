@@ -14,7 +14,7 @@
 
 ## 二、开始测试
 ### 1、修改配置
-* cd basebench
+* cd openstack_basebench
 * 根据实际情况修改config/config.py
 
 ### 2、基准测试
