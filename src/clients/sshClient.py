@@ -18,7 +18,7 @@ class SSHClient():
         self._sshclient.set_missing_host_key_policy(paramiko.AutoAddPolicy)
         self._sshclient.connect(hostname=self._ip, port=self._port, username=self._username, password=self._password)
 
-        sftp = paramiko.Transport(self._ip,self._port)
+        sftp = paramiko.Transport(self._ip+':'+str(self._port))
         sftp.connect(username=self._username, password=self._password)
         self._sftpclient = paramiko.SFTP.from_transport(sftp)
 
