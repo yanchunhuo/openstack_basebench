@@ -5,6 +5,8 @@ class Net:
         self.id=None
         self.name=None
         self.cidr=None
+        # 网络子网
+        self.subnet_ids = []
 
     @property
     def name(self):
@@ -29,3 +31,9 @@ class Net:
     @cidr.setter
     def cidr(self,cidr):
         self.cidr=cidr
+
+    def add_subnet_id(self,subnet_id):
+        self.subnet_ids.append(subnet_id)
+
+    def get_subnet_ids(self):
+        return self.subnet_ids

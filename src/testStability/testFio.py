@@ -104,7 +104,7 @@ class TestFio:
         sshclient = SSHClient(compute_float_ip)
 
         self._loggers.stabilityFioLogger.info('开始停止fio测试,云主机' + compute_name)
-        stop_command = "kill -9 `ps -A |grep fio|awk '{print $1}'`"
+        stop_command = "kill -9 `ps -ef |grep fio|grep -v grep|awk '{print $2}'`"
         stdin, stdout, stderr, exit_code = sshclient.ssh_exec_command(command=stop_command, timeout=20)
         if exit_code:
             self._loggers.stabilityFioLogger.error('停止云主机' + compute_name + 'fio测试失败' + '\r\n' + stderr.read())

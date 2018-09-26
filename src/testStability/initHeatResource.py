@@ -80,7 +80,6 @@ class InitHeatResource:
         except Exception,e:
             self._loggers.stabilityHeatLogger.error('初始化网络'+self._router_name+'失败!'+'\r\n'+e.message)
         self._test_heat_net_id = test_heat_net.id
-        self._accountResource.add_net(test_heat_net)
 
         self._loggers.stabilityHeatLogger.info('初始化一个路由器资源，创建名为' + self._router_name + '的路由')
         test_router=Router()
@@ -95,8 +94,10 @@ class InitHeatResource:
             test_heat_net_subnet_id = self._openstackClient.getSubNetId(self._test_heat_net_id)
             self._openstackClient.addRouterInterface(self._router_id, test_heat_net_subnet_id)
             test_router.add_subnet_id(test_heat_net_subnet_id)
+            test_heat_net.add_subnet_id(test_heat_net_subnet_id)
         except Exception, e:
             self._loggers.stabilityHeatLogger.error('将heat网络' + self._test_heat_net_name + '绑定到路由器' + self._router_name + '失败!' + '\r\n' + e.message)
+        self._accountResource.add_net(test_heat_net)
         self._accountResource.add_router(test_router)
 
         # 初始化heat必须有的资源

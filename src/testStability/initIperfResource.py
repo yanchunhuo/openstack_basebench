@@ -88,8 +88,6 @@ class InitIperfResource:
             self._loggers.stabilityIperfLogger.error('初始化iperf测试的网络'+self._test_iperf_net1_name+'和'+self._test_iperf_net2_name+'失败!'+'\r\n'+e.message)
         self._test_iperf_net1_id=test_iperf_net1.id
         self._test_iperf_net2_id=test_iperf_net2.id
-        self._accountResource.add_net(test_iperf_net1)
-        self._accountResource.add_net(test_iperf_net2)
 
         self._loggers.stabilityIperfLogger.info('初始化一个路由器资源，创建名为' + self._router_name + '的路由')
         test_router=Router()
@@ -104,6 +102,7 @@ class InitIperfResource:
             test_iperf_net1_subnet_id=self._openstackClient.getSubNetId(self._test_iperf_net1_id)
             self._openstackClient.addRouterInterface(self._router_id,test_iperf_net1_subnet_id)
             test_router.add_subnet_id(test_iperf_net1_subnet_id)
+            test_iperf_net1.add_subnet_id(test_iperf_net1_subnet_id)
         except Exception,e:
             self._loggers.stabilityIperfLogger.error('将iperf网络' + self._test_iperf_net1_name + '绑定到路由器' + self._router_name+'失败!'+e.message)
         self._loggers.stabilityIperfLogger.info('将iperf网络' + self._test_iperf_net2_name + '绑定到路由器' + self._router_name)
@@ -111,8 +110,11 @@ class InitIperfResource:
             test_iperf_net2_subnet_id = self._openstackClient.getSubNetId(self._test_iperf_net2_id)
             self._openstackClient.addRouterInterface(self._router_id, test_iperf_net2_subnet_id)
             test_router.add_subnet_id(test_iperf_net2_subnet_id)
+            test_iperf_net2.add_subnet_id(test_iperf_net2_subnet_id)
         except Exception,e:
             self._loggers.stabilityIperfLogger.error('将iperf网络' + self._test_iperf_net2_name + '绑定到路由器' + self._router_name+'失败!'+e.message)
+        self._accountResource.add_net(test_iperf_net1)
+        self._accountResource.add_net(test_iperf_net2)
         self._accountResource.add_router(test_router)
 
         # 获取可用域

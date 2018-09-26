@@ -96,7 +96,7 @@ class TestSysbench:
 
         #关闭客户端程序
         self._loggers.stabilitySysbenchLogger.info('停止sysbench测试')
-        stdin, stdout, stderr, exit_code=sysbench_client_sshclient.ssh_exec_command(command="kill -9 `ps -A |grep sysbench| awk '{print $1}'`",timeout=10)
+        stdin, stdout, stderr, exit_code=sysbench_client_sshclient.ssh_exec_command(command="kill -9 `ps -ef |grep sysbench|grep -v grep| awk '{print $2}'`",timeout=10)
         if exit_code:
             self._loggers.stabilitySysbenchLogger.error('关闭sysbench客户端进程失败')
 

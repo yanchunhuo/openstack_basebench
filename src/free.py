@@ -29,41 +29,52 @@ class Free:
     def freeCompute(self,computes_array):
         compute_ids=[]
         for compute in computes_array:
-            compute_ids.append(compute['id'])
+            if compute['id']:
+                compute_ids.append(compute['id'])
         self._novaClient.deleteAllCompute(compute_ids)
 
     def freeVolume(self,volumes_array):
         volume_ids=[]
         for volume in volumes_array:
-            volume_ids.append(volume['id'])
+            if volume['id']:
+                volume_ids.append(volume['id'])
         self._cinderClient.deleteAllVolume(volume_ids)
 
     def freeLoadbalancer(self,loadbalancers_array):
         loadbalancer_ids=[]
         for loadbalancer in loadbalancers_array:
-            loadbalancer_ids.append(loadbalancer['id'])
+            if loadbalancer['id']:
+                loadbalancer_ids.append(loadbalancer['id'])
         self._loadbalancerClient.deleteLoadbalancer(loadbalancer_ids)
 
     def freeRouter(self,routers_array):
         router_ids=[]
         for router in routers_array:
             router_id=router['id']
-            router_ids.append(router_id)
+            if router_id:
+                router_ids.append(router_id)
             router_subnet_ids=router['subnet_ids']
             for router_subnet_id in router_subnet_ids:
-                self._openstackClient.removeRouterInterface(router_id,router_subnet_id)
+                if router_subnet_id:
+                    self._openstackClient.removeRouterInterface(router_id,router_subnet_id)
         self._openstackClient.deleteAllRouter(router_ids)
 
     def freeNet(self,nets_array):
         net_ids=[]
+        subnetPort_ids=[]
         for net in nets_array:
-            net_ids.append(net['id'])
+            if net['id']:
+                subnet_id=self._openstackClient.getSubNetId(net['id'])
+                subnetPort_ids=subnetPort_ids+self._openstackClient.getSubnetPortIds(subnet_id)
+                net_ids.append(net['id'])
+        self._openstackClient.deleteSubnetPorts(subnetPort_ids)
         self._openstackClient.deleteAllNet(net_ids)
 
     def freeFloatIp(self,floatIps_array):
         floatIp_ids=[]
         for floatIp in floatIps_array:
-            floatIp_ids.append(floatIp['id'])
+            if floatIp['id']:
+                floatIp_ids.append(floatIp['id'])
         self._openstackClient.deleteAllFloatIp(floatIp_ids)
 
     def freeSecgroup(self,secgruop_array):
@@ -73,15 +84,18 @@ class Free:
         sysbench1_ids=[]
         sysbench_ids = []
         for sysbench1 in sysbench_array:
-            sysbench1_ids.append(sysbench1[1])
+            if sysbench1[1]:
+                sysbench1_ids.append(sysbench1[1])
         for sysbench in sysbench1_ids:
-            sysbench_ids.append(sysbench['id'])
+            if sysbench['id']:
+                sysbench_ids.append(sysbench['id'])
         self._troveClient.deleteAllTrove(sysbench_ids)
 
     def freeHeat(self,heat_array):
         heat_ids=[]
         for floatIp in heat_array:
-            heat_ids.append(floatIp['id'])
+            if floatIp['id']:
+                heat_ids.append(floatIp['id'])
         self._heatClient.deleteAllHeat(heat_ids)
 
     def freeObejectstore(self):

@@ -113,18 +113,17 @@ class TestIperf:
         iperf_client_sshclient=SSHClient(compute_client_float_ip)
         iperf_server_sshclient=SSHClient(compute_server_float_ip)
 
-        #关闭防火墙
-        self._loggers.stabilityIperfLogger.info('关闭云主机'+compute_client_name+'和云主机'+compute_server_name+'的防火墙')
+        # 关闭防火墙
         iperf_client_sshclient.ssh_exec_command('service iptables stop',30)
         iperf_server_sshclient.ssh_exec_command('service iptables stop', 30)
 
         #关闭客户端程序
-        stdin, stdout, stderr, exit_code=iperf_client_sshclient.ssh_exec_command(command="kill -9 `ps -A |grep iperf3| awk '{print $1}'`",timeout=10)
+        stdin, stdout, stderr, exit_code=iperf_client_sshclient.ssh_exec_command(command="kill -9 `ps -ef |grep iperf3|grep -v grep|awk '{print $2}'`",timeout=10)
         if exit_code:
             self._loggers.stabilityIperfLogger.error('关闭iperf客户端进程失败')
 
         #关闭服务端程序
-        stdin, stdout, stderr, exit_code=iperf_server_sshclient.ssh_exec_command(command="kill -9 `ps -A |grep iperf3| awk '{print $1}'`",timeout=10)
+        stdin, stdout, stderr, exit_code=iperf_server_sshclient.ssh_exec_command(command="kill -9 `ps -ef |grep iperf3|grep -v grep|awk '{print $2}'`",timeout=10)
         if exit_code:
             self._loggers.stabilityIperfLogger.error('关闭iperf服务端进程失败')
         # 关闭ssh

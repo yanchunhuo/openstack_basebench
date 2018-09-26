@@ -84,7 +84,6 @@ class InitLoadbalancerResource:
         except Exception, e:
             self._loggers.stabilityLoadbalancerLogger.error('创建loadbalancer网络' + self._test_loadbalancer_net_name + '失败!'+'\r\n'+e.message)
         self._test_loadbalancer_net_id=test_loadbalancer_net.id
-        self._accountResource.add_net(test_loadbalancer_net)
 
         self._loggers.stabilityLoadbalancerLogger.info('初始化一个路由器资源，创建名为' + self._router_name + '的路由')
         test_router=Router()
@@ -99,8 +98,10 @@ class InitLoadbalancerResource:
             self._test_loadbalancer_net_subnet_id = self._openstackClient.getSubNetId(self._test_loadbalancer_net_id)
             self._openstackClient.addRouterInterface(self._router_id,self._test_loadbalancer_net_subnet_id)
             test_router.add_subnet_id(self._test_loadbalancer_net_subnet_id)
+            test_loadbalancer_net.add_subnet_id(self._test_loadbalancer_net_subnet_id)
         except Exception, e:
             self._loggers.stabilityLoadbalancerLogger.error('将loadbalancer网络' + self._test_loadbalancer_net_name + '绑定到路由器' + self._router_name+'失败!'+'\r\n'+e.message)
+        self._accountResource.add_net(test_loadbalancer_net)
         self._accountResource.add_router(test_router)
 
         for i in range(int(self._readConfig.executeTest.stability_test_loadbalancer_group_num)):

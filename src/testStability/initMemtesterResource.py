@@ -81,7 +81,6 @@ class InitMemtesterResource:
         except Exception,e:
             self._loggers.stabilityMemtesterLogger.error('创建网络'+test_memtester_net.name+'失败!'+'\r\n'+e.message)
         self._test_memtester_net_id = test_memtester_net.id
-        self._accountResource.add_net(test_memtester_net)
 
         self._loggers.stabilityMemtesterLogger.info('初始化一个路由器资源，创建名为' + self._router_name + '的路由')
         test_router=Router()
@@ -96,8 +95,10 @@ class InitMemtesterResource:
             test_memtester_net_subnet_id = self._openstackClient.getSubNetId(self._test_memtester_net_id)
             self._openstackClient.addRouterInterface(self._router_id, test_memtester_net_subnet_id)
             test_router.add_subnet_id(test_memtester_net_subnet_id)
+            test_memtester_net.add_subnet_id(test_memtester_net_subnet_id)
         except Exception,e:
             self._loggers.stabilityMemtesterLogger.error('将memtester网络' + self._test_memtester_net_name + '绑定到路由器' + self._router_name+'失败!'+'\r\n'+e.message)
+        self._accountResource.add_net(test_memtester_net)
         self._accountResource.add_router(test_router)
 
         self._loggers.stabilityMemtesterLogger.info('初始化memtester测试的云主机')

@@ -92,7 +92,7 @@ class TestObjectstore:
         sshclient = SSHClient(compute_float_ip)
 
         self._loggers.stabilityObjstoreLogger.info('开始停止对象存储测试,云主机' + compute_name)
-        stop_command = "kill -9 `ps -A |grep jmeter|awk '{print $1}'`"
+        stop_command = "kill -9 `ps -ef |grep jmeter|grep -v grep|awk '{print $2}'`"
         stdin, stdout, stderr, exit_code = sshclient.ssh_exec_command(command=stop_command, timeout=20)
         if exit_code:
             self._loggers.stabilityObjstoreLogger.error('停止云主机' + compute_name + '对象存储测试失败' + '\r\n' + stderr.read())

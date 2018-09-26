@@ -100,7 +100,6 @@ class InitResource:
         except Exception,e:
             self._loggers.basebenchLogger.error('创建网络'+test_fio_net.name+'失败!'+'\r\n'+e.message)
         self._test_fio_net_id = test_fio_net.id
-        self._accountResource.add_net(test_fio_net)
 
         self._loggers.basebenchLogger.info('初始化fio路由器资源，创建名为' + self._test_fio_router_name + '的路由器')
         test_fio_router=Router()
@@ -113,9 +112,11 @@ class InitResource:
         try:
             test_fio_net_subnet_id = self._openstackClient.getSubNetId(self._test_fio_net_id)
             self._openstackClient.addRouterInterface(test_fio_router.id, test_fio_net_subnet_id)
+            test_fio_net.add_subnet_id(test_fio_net_subnet_id)
             test_fio_router.add_subnet_id(test_fio_net_subnet_id)
         except Exception,e:
             self._loggers.basebenchLogger.error('将fio网络' + test_fio_net.name + '绑定到路由器' + test_fio_router.name +'失败'+'\r\n'+e.message)
+        self._accountResource.add_net(test_fio_net)
         self._accountResource.add_router(test_fio_router)
 
         self._loggers.basebenchLogger.info('初始化fio测试的云主机')
@@ -201,7 +202,6 @@ class InitResource:
         except Exception,e:
             self._loggers.basebenchLogger.error('创网络' + self._test_unixbench_net_name + '失败!'+'\r\n'+e.message)
         self._unixbench_net_id = test_unixbench_net.id
-        self._accountResource.add_net(test_unixbench_net)
 
         self._loggers.basebenchLogger.info('初始化unixbench路由器资源，创建名为' + self._test_unixbench_router_name + '的路由器')
         test_unixbench_router = Router()
@@ -215,8 +215,10 @@ class InitResource:
             test_unixbench_net_subnet_id = self._openstackClient.getSubNetId(self._unixbench_net_id)
             self._openstackClient.addRouterInterface(test_unixbench_router.id, test_unixbench_net_subnet_id)
             test_unixbench_router.add_subnet_id(test_unixbench_net_subnet_id)
+            test_unixbench_net.add_subnet_id(test_unixbench_net_subnet_id)
         except Exception, e:
             self._loggers.basebenchLogger.error('将unixbench网络' + test_unixbench_net.name + '绑定到路由器' + test_unixbench_router.name + '失败' + '\r\n' + e.message)
+        self._accountResource.add_net(test_unixbench_net)
         self._accountResource.add_router(test_unixbench_router)
 
         self._loggers.basebenchLogger.info('初始化unixbench测试的云主机')
@@ -287,8 +289,6 @@ class InitResource:
             self._loggers.basebenchLogger.error('初始化iperf测试的网络'+self._test_iperf_net1_name+'和'+self._test_iperf_net2_name+'失败!'+'\r\n'+e.message)
         self._test_iperf_net1_id=test_iperf_net1.id
         self._test_iperf_net2_id=test_iperf_net2.id
-        self._accountResource.add_net(test_iperf_net1)
-        self._accountResource.add_net(test_iperf_net2)
 
         self._loggers.basebenchLogger.info('初始化iperf路由器资源，创建名为' + self._test_iperf_router_name + '的路由器')
         test_iperf_router = Router()
@@ -302,6 +302,7 @@ class InitResource:
             test_iperf_net1_subnet_id=self._openstackClient.getSubNetId(self._test_iperf_net1_id)
             self._openstackClient.addRouterInterface(test_iperf_router.id,test_iperf_net1_subnet_id)
             test_iperf_router.add_subnet_id(test_iperf_net1_subnet_id)
+            test_iperf_net1.add_subnet_id(test_iperf_net1_subnet_id)
         except Exception,e:
             self._loggers.basebenchLogger.error('将iperf网络' + self._test_iperf_net1_name + '绑定到路由器' + test_iperf_router.name +'失败!'+'\r\n'+e.message)
         self._loggers.basebenchLogger.info('将iperf网络' + self._test_iperf_net2_name + '绑定到路由器' + test_iperf_router.name)
@@ -309,8 +310,11 @@ class InitResource:
             test_iperf_net2_subnet_id = self._openstackClient.getSubNetId(self._test_iperf_net2_id)
             self._openstackClient.addRouterInterface(test_iperf_router.id, test_iperf_net2_subnet_id)
             test_iperf_router.add_subnet_id(test_iperf_net2_subnet_id)
+            test_iperf_net2.add_subnet_id(test_iperf_net2_subnet_id)
         except Exception,e:
             self._loggers.basebenchLogger.error('将iperf网络' + self._test_iperf_net2_name + '绑定到路由器' + test_iperf_router.name+'失败!'+'\r\n'+e.message)
+        self._accountResource.add_net(test_iperf_net1)
+        self._accountResource.add_net(test_iperf_net2)
         self._accountResource.add_router(test_iperf_router)
 
         self._loggers.basebenchLogger.info('初始化iperf测试的云主机')

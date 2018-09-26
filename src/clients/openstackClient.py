@@ -1,8 +1,7 @@
 #!-*- coding:utf8 -*-
-import subprocess
-
 from src.authTool import AuthTool
-
+from src.common.strTool import StrTool
+import subprocess
 
 class OpenstackClient:
     def __init__(self,os_tenant_name,os_project_name,os_username,os_password):
@@ -120,6 +119,33 @@ class OpenstackClient:
         if not subnet_id:
             return None
         return subnet_id
+
+    def getSubnetPortIds(self,subnet_id):
+        """
+        获得子网的端口id
+        :param subnet_id:
+        :return:
+        """
+        command="openstack port list|grep -i "+subnet_id+"|awk -F '|' '{print $2}'"
+        command=self._openstackInsertAuth(command)
+        subnetPort_ids=subprocess.check_output(command,shell=True)
+        subnetPort_ids=subnetPort_ids.strip()
+        subnetPort_ids=subnetPort_ids.split('\n')
+        return subnetPort_ids
+
+    def deleteSubnetPorts(self,subnetPort_ids):
+        """
+        删除子网的端口
+        :param subnetPort_ids:
+        :return:
+        """
+        if len(subnetPort_ids) != 0:
+            del_subnetPorts_command = "openstack port delete "
+            for subnetPort_id in subnetPort_ids:
+                del_subnetPorts_command=del_subnetPorts_command+subnetPort_id+' '
+            del_subnetPorts_command = self._openstackInsertAuth(del_subnetPorts_command)
+            subprocess.check_output(del_subnetPorts_command, shell=True)
+        return True
 
     def getRouterId(self,router_name):
         """

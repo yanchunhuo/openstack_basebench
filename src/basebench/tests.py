@@ -198,7 +198,7 @@ class Tests:
         #下载测试结果
         iperf_client_sshclient.sftp_get('/root/result/'+compute_testType+'_result.txt','output/iperf/'+compute_testType+'_result.txt')
         #关闭服务端程序
-        stdin, stdout, stderr, exit_code=iperf_server_sshclient.ssh_exec_command(command="kill -9 `ps -A |grep iperf3| awk '{print $1}'`",timeout=10)
+        stdin, stdout, stderr, exit_code=iperf_server_sshclient.ssh_exec_command(command="kill -9 `ps -ef |grep iperf3|grep -v grep|awk '{print $2}'`",timeout=10)
         if exit_code:
             self._loggers.basebenchLogger.error('关闭iperf服务端进程失败')
         # 关闭ssh

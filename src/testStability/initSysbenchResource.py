@@ -87,7 +87,6 @@ class InitSysbenchResource:
         except Exception, e:
             self._loggers.stabilitySysbenchLogger.info('创建网络' + self._test_sysbench_net_name + '失败'+'\r\n'+e.message)
         self._test_sysbench_net_id=test_sysbench_net.id
-        self._accountResource.add_net(test_sysbench_net)
 
         self._loggers.stabilitySysbenchLogger.info('初始化一个路由器资源，创建名为' + self._router_name + '的路由')
         test_router = Router()
@@ -102,12 +101,13 @@ class InitSysbenchResource:
             test_sysbench_net_subnet_id=self._openstackClient.getSubNetId(self._test_sysbench_net_id)
             self._openstackClient.addRouterInterface(self._router_id, test_sysbench_net_subnet_id)
             test_router.add_subnet_id(test_sysbench_net_subnet_id)
+            test_sysbench_net.add_subnet_id(test_sysbench_net_subnet_id)
         except Exception, e:
             self._loggers.stabilitySysbenchLogger.info('将Sysbench网络' + self._test_sysbench_net_name + '绑定到路由器' + self._router_name+ '失败'+'\r\n'+e.message)
+        self._accountResource.add_net(test_sysbench_net)
         self._accountResource.add_router(test_router)
 
         #初始化trove必须有的资源
-
         self._trove_volume_size = '100'
         self._database_name = 'sbtest'
         self._user_name = 'test'

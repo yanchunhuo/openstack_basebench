@@ -73,7 +73,7 @@ class TestMemtester:
         sshclient = SSHClient(compute_float_ip)
 
         self._loggers.stabilityMemtesterLogger.info('开始停止memtester测试,云主机' + compute_name)
-        stop_command = "kill -9 `ps -A |grep memtester|awk '{print $1}'`"
+        stop_command = "kill -9 `ps -ef |grep memtester|grep -v grep|awk '{print $2}'`"
         stdin, stdout, stderr, exit_code = sshclient.ssh_exec_command(command=stop_command, timeout=20)
         if exit_code:
             self._loggers.stabilityMemtesterLogger.error('停止云主机' + compute_name + 'memtester测试失败' + '\r\n' + stderr.read())
