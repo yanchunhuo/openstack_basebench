@@ -17,7 +17,7 @@
 * pip install -r requirements.txt
 
 ### 3、下载测试代码
-* git clone http://124.239.146.247:9091/baiwucloud/basebench.git
+* git clone https://github.com/yanchunhuo/openstack_basebench.git
 
 ## 二、开始测试
 ### 1、修改配置
