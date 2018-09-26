@@ -83,3 +83,5 @@
 * limingya
 * yanchunhuo
  
+ # [打赏]()
+![avatar](https://github.com/yanchunhuo/resources/blob/master/Alipay.jpg)
