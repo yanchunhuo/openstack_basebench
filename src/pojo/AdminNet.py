@@ -1,6 +1,6 @@
 #!-*- coding:utf8 -*-
 
-class AdminNet():
+class AdminNet:
     def __init__(self):
         self.id=None
         self.name=None

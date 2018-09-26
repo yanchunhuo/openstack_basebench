@@ -1,10 +1,8 @@
 #!-*- coding:utf8 -*-
-import threading
-import os
-from src.testStability.testUnixbench import TestUnixbench
-from src.common import readJsonFromFile
+from src.common.fileTool import FileTool
 from src.pojo.Compute import Compute
-
+from src.testStability.testUnixbench import TestUnixbench
+import threading
 
 class StopUnixbench(threading.Thread):
     def __init__(self,accountResourceFilePath):
@@ -13,7 +11,7 @@ class StopUnixbench(threading.Thread):
 
     def run(self):
         testUnixbench = TestUnixbench()
-        unixbenchAccountResource=readJsonFromFile(self._accountResourceFilePath)
+        unixbenchAccountResource=FileTool.readJsonFromFile(self._accountResourceFilePath)
         compute_array=unixbenchAccountResource['_unixbenchComputes']
         for compute in compute_array:
             tmp_compute=Compute()

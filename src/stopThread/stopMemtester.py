@@ -1,10 +1,8 @@
 #!-*- coding:utf8 -*-
-import threading
-import os
-from src.testStability.testMemtester import TestMemtester
-from src.common import readJsonFromFile
+from src.common.fileTool import FileTool
 from src.pojo.Compute import Compute
-
+from src.testStability.testMemtester import TestMemtester
+import threading
 
 class StopMemtester(threading.Thread):
     def __init__(self,accountResourceFilePath):
@@ -13,7 +11,7 @@ class StopMemtester(threading.Thread):
 
     def run(self):
         testMemtester = TestMemtester()
-        memtesterAccountResource=readJsonFromFile(self._accountResourceFilePath)
+        memtesterAccountResource=FileTool.readJsonFromFile(self._accountResourceFilePath)
         compute_array=memtesterAccountResource['_memtesterComputes']
         for compute in compute_array:
             tmp_compute=Compute()

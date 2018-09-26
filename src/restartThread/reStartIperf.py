@@ -1,9 +1,8 @@
 #!-*- coding:utf8 -*-
-import threading
 from src.testStability.testIperf import TestIperf
-from src.common import readJsonFromFile
+from src.common.fileTool import FileTool
 from src.pojo.Compute import Compute
-
+import threading
 
 class ReStartIperf(threading.Thread):
     def __init__(self,accountResourceFilePath):
@@ -12,7 +11,7 @@ class ReStartIperf(threading.Thread):
 
     def run(self):
         testIperf = TestIperf()
-        iperfAccountResource=readJsonFromFile(self._accountResourceFilePath)
+        iperfAccountResource=FileTool.readJsonFromFile(self._accountResourceFilePath)
         compute_pair_array=iperfAccountResource['_iperfComputePairs']
         for compute_pair in compute_pair_array:
             compute_client=Compute()

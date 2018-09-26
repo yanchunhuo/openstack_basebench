@@ -3,7 +3,6 @@ import threading
 import time
 import subprocess
 
-
 class CheckTroveRunSucc(threading.Thread):
     def __init__(self,trove_id,command):
         threading.Thread.__init__(self,name='checkTroveRunSucc')

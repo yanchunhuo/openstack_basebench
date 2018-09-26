@@ -1,9 +1,8 @@
 #!-*- coding:utf8 -*-
-import threading
-from src.testStability.testLoadbalancer import TestLoadbalancer
-from src.common import readJsonFromFile
+from src.common.fileTool import FileTool
 from src.pojo.LoadBalancer import LoadBalancer
-
+from src.testStability.testLoadbalancer import TestLoadbalancer
+import threading
 
 class StopLoadbalancer(threading.Thread):
     def __init__(self,accountResourceFilePath):
@@ -12,7 +11,7 @@ class StopLoadbalancer(threading.Thread):
 
     def run(self):
         testLoadbalancer=TestLoadbalancer()
-        loadbalancerAccountResource=readJsonFromFile(self._accountResourceFilePath)
+        loadbalancerAccountResource=FileTool.readJsonFromFile(self._accountResourceFilePath)
         loadbalancers=loadbalancerAccountResource['_loadbalancers']
 
         for loadbalancer in loadbalancers:

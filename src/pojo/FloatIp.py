@@ -1,5 +1,5 @@
 #!-*- coding:utf8 -*-
-class FloatIp():
+class FloatIp:
     def __init__(self):
         self.id=None
         self.ip=None

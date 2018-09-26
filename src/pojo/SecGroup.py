@@ -1,6 +1,6 @@
 #!-*- coding:utf8 -*-
 
-class SecGroup():
+class SecGroup:
     def __init__(self):
         self.id = None
         self.name = None

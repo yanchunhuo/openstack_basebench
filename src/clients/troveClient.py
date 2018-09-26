@@ -1,13 +1,13 @@
 #!-*- coding:utf8 -*-
-from config.config import *
-from src import common
+from src.authTool import AuthTool
 from src.timeoutThread.checkTroveDel import CheckTroveDel
 from src.timeoutThread.checkTroveRunSucc import CheckTroveRunSucc
 import subprocess
 
 
-class TroveClient():
+class TroveClient:
     def __init__(self,os_tenant_name,os_project_name,os_username,os_password):
+        self._authTool=AuthTool()
         self._os_tenant_name=os_tenant_name
         self._os_project_name=os_project_name
         self._os_username=os_username
@@ -20,8 +20,7 @@ class TroveClient():
         :param command:
         :return:
         """
-        return common.troveInsertAuth(command, self._os_tenant_name, self._os_project_name, self._os_username,self._os_password)
-
+        return self._authTool.troveInsertAuth(command, self._os_tenant_name, self._os_project_name, self._os_username,self._os_password)
 
     def createtrove(self, trove_name, flavor_id, trove_volume_size, database_name, user_name,user_password, net_id, zone_name, datastore_name, datastore_version_name):
         """
@@ -47,15 +46,13 @@ class TroveClient():
                 return None
             self._is_trove_run_succ(trove_id)
             return trove_id
-        except Exception,e:
+        except Exception:
             return None
-
-
 
     def _is_trove_run_succ(self,trove_id):
         """
         数据库实例创建60秒后是否处于运行中
-        :param compute_id:
+        :param trove_id:
         :return:
         """
         command = "trove list|grep -i "+trove_id+"|awk -F '|' '{print $6}'"
@@ -70,10 +67,6 @@ class TroveClient():
         elif is_succ:
             return True
 
-
-
-
-
     def deleteAllTrove(self, trove_ids):
         """
         删除所有数据库实例
@@ -87,8 +80,6 @@ class TroveClient():
                 del_command = self._troveInertAuth(del_command)
                 subprocess.check_output(del_command, shell=True)
                 self._is_trove_del(trove_id)
-
-
 
     def _is_trove_del(self,trove_id):
         """
@@ -107,10 +98,3 @@ class TroveClient():
             return False
         elif is_succ:
             return True
-
-
-
-
-
-
-

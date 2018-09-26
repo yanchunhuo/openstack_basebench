@@ -1,8 +1,7 @@
 #!-*- coding:utf8 -*-
-
-import threading
 from src.testStability.testObjectstore import TestObjectstore
 from src.testStability.initObjectstoreResource import InitObjectStoreResource
+import threading
 
 class StartObjectStorage(threading.Thread):
     def __init__(self):

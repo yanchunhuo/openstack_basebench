@@ -1,10 +1,8 @@
 #!-*- coding:utf8 -*-
-import threading
 from src.testStability.testSysbench import TestSysbench
-from src.common import readJsonFromFile
+from src.common.fileTool import FileTool
 from src.pojo.Compute import Compute
-
-
+import threading
 
 class ReStartSysbench(threading.Thread):
     def __init__(self,accountResourceFilePath):
@@ -13,7 +11,7 @@ class ReStartSysbench(threading.Thread):
 
     def run(self):
         testSysbench = TestSysbench()
-        sysbenchAccountResource=readJsonFromFile(self._accountResourceFilePath)
+        sysbenchAccountResource=FileTool.readJsonFromFile(self._accountResourceFilePath)
         sysbench_pair_array=sysbenchAccountResource['_sysbenchComputePairs']
         for sysbench_pair in sysbench_pair_array:
             compute_client=Compute()

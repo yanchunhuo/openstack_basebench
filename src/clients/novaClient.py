@@ -1,13 +1,12 @@
 #!-*- coding:utf8 -*-
-from config.config import *
-from src import common
+from src.authTool import AuthTool
 from src.timeoutThread.checkComputeRunSucc import CheckComputeRunSucc
 from src.timeoutThread.checkAllComputeDel import CheckAllComputeDel
 import subprocess
 
-class NovaClient():
-    def __init__(self,os_tenant_name,os_project_name,os_username,os_password):
-        self._os_tenant_name=os_tenant_name
+class NovaClient:
+    def __init__(self,os_project_name,os_username,os_password):
+        self._authTool=AuthTool()
         self._os_project_name=os_project_name
         self._os_username=os_username
         self._os_password=os_password
@@ -18,7 +17,7 @@ class NovaClient():
         :param command:
         :return:
         """
-        return common.novaInsertAuth(command,self._os_tenant_name,self._os_project_name,self._os_username,self._os_password)
+        return self._authTool.novaInsertAuth(command,self._os_project_name,self._os_username,self._os_password)
 
     def getImageId(self,image_name):
         """
@@ -75,11 +74,11 @@ class NovaClient():
         :param compute_id:
         :return:
         """
-        command = "nova list|grep -i "+compute_id+"|awk -F '|' '{print $6}'"
+        command = "nova list|grep -i "+compute_id+"|awk -F '|' '{print $4}'"
         command = self._novaInertAuth(command)
         checkComputeRunSucc=CheckComputeRunSucc(compute_id,command)
         checkComputeRunSucc.start()
-        checkComputeRunSucc.join(60)
+        checkComputeRunSucc.join(120)
         is_succ=checkComputeRunSucc.getIsSucc()
         if not is_succ:
             checkComputeRunSucc.setIsSucc(True)
@@ -94,6 +93,20 @@ class NovaClient():
         :return:compute_id
         """
         command = "nova list|grep -i "+compute_name+"|awk -F '|' '{print $2}'"
+        command =self._novaInertAuth(command)
+        compute_id = subprocess.check_output(command, shell=True)
+        compute_id = compute_id.strip()
+        if not compute_id:
+            return None
+        return compute_id
+
+    def getTenantsComputeId(self,compute_name):
+        """
+        获取所有账户云主机id
+        :param compute_name:
+        :return:compute_id
+        """
+        command = "nova list --all-tenant|grep -i "+compute_name+"|awk -F '|' '{print $2}'"
         command =self._novaInertAuth(command)
         compute_id = subprocess.check_output(command, shell=True)
         compute_id = compute_id.strip()
@@ -140,7 +153,7 @@ class NovaClient():
         :param float_ip_address:
         :return:
         """
-        command = "nova add-floating-ip "+compute_id+" "+float_ip_address
+        command = "nova floating-ip-associate "+compute_id+" "+float_ip_address
         command =self._novaInertAuth(command)
         subprocess.check_output(command, shell=True)
         return True
@@ -171,7 +184,7 @@ class NovaClient():
             del_command=self._novaInertAuth(del_command)
             subprocess.check_output(del_command,shell=True)
             self._is_all_compute_del(compute_ids)
-            return True
+        return True
 
     def _is_all_compute_del(self,compute_ids):
         """

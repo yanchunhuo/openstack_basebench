@@ -1,7 +1,7 @@
 #!-*- coding:utf8 -*-
-import threading
 from src.testStability.testSysbench import TestSysbench
 from src.testStability.initSysbenchResource import InitSysbenchResource
+import threading
 
 class StartSysbench(threading.Thread):
     def __init__(self):

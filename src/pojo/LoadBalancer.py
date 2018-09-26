@@ -1,5 +1,5 @@
 #!-*- coding:utf8 -*-
-class LoadBalancer():
+class LoadBalancer:
     def __init__(self):
         self.id=None
         self.name=None

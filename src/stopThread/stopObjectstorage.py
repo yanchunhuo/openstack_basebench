@@ -1,8 +1,8 @@
 #!-*- coding:utf8 -*-
-import threading
-from src.testStability.testObjectstore import TestObjectstore
-from src.common import readJsonFromFile
+from src.common.fileTool import FileTool
 from src.pojo.Compute import Compute
+from src.testStability.testObjectstore import TestObjectstore
+import threading
 
 class StopObjectStorage(threading.Thread):
     def __init__(self,accountResourceFilePath):
@@ -11,7 +11,7 @@ class StopObjectStorage(threading.Thread):
 
     def run(self):
         testobjectstore = TestObjectstore()
-        objectstoreAccountResource = readJsonFromFile(self._accountResourceFilePath)
+        objectstoreAccountResource = FileTool.readJsonFromFile(self._accountResourceFilePath)
         compute_array = objectstoreAccountResource['_objectstorage']
         for compute in compute_array:
             tmp_compute=Compute()

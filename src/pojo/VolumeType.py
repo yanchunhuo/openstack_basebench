@@ -1,6 +1,6 @@
 #!-*- coding:utf8 -*-
 
-class VolumeType():
+class VolumeType:
     def __init__(self):
         self.id = None
         self.name = None

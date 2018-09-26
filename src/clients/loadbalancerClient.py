@@ -1,18 +1,18 @@
 #!-*- coding:utf8 -*-
+from src.authTool import AuthTool
+from src.common.strTool import StrTool
 import subprocess
-from src import common
 
-class LoadbalancerClient():
+class LoadbalancerClient:
     def __init__(self, os_tenant_name, os_project_name, os_username, os_password):
+        self._authTool=AuthTool()
         self._os_tenant_name = os_tenant_name
         self._os_project_name = os_project_name
         self._os_username = os_username
         self._os_password = os_password
 
-
     def _neutronInsertAuth(self,command):
-        return common.neutronInsertAuth(command,self._os_tenant_name,self._os_username,self._os_password)
-
+        return self._authTool.neutronInsertAuth(command,self._os_tenant_name,self._os_username,self._os_password)
 
     def createLoadbalancer(self, lb_name, floatingip_id, subnet_id, connection_limit, protocol, protocol_port, lb_algorithmt,
                            delay_time, max_retries, timeout, protocol_type, instance_ips_weight):
@@ -29,13 +29,13 @@ class LoadbalancerClient():
         :param max_retries: 尝试次数，范围1-10
         :param timeout: 超时时间，范围5-300
         :param protocol_type: 健康检查方式，可选PING、HTTP
-        :param instance_ips_weight: 数组[云主机ip,weight],weight范围1-10
+        :param instance_ips_weight: 数组[[云主机ip,weight],[云主机ip,weight]],weight范围1-10
         :return: loadbalancer_id
         """
         command = "neutron lbaas-loadbalancer-create --name " + lb_name + " --floatingip_id " + floatingip_id + " -f json"
         command = self._neutronInsertAuth(command)
         loadbalancer_id = subprocess.check_output(command, shell=True)
-        loadbalancer_id = common.getStringWithLBRB(loadbalancer_id, '{"Field": "id", "Value": "', '"}')
+        loadbalancer_id = StrTool.getStringWithLBRB(loadbalancer_id, '{"Field": "id", "Value": "', '"}')
         loadbalancer_id = loadbalancer_id.strip()
         if not loadbalancer_id:
             return None
@@ -74,7 +74,7 @@ class LoadbalancerClient():
                   + connection_limit + " --protocol " + protocol + " --protocol-port " + protocol_port + " -f json"
         command = self._neutronInsertAuth(command)
         listener_id = subprocess.check_output(command, shell=True)
-        listener_id = common.getStringWithLBRB(listener_id, '{"Field": "id", "Value": "', '"}')
+        listener_id = StrTool.getStringWithLBRB(listener_id, '{"Field": "id", "Value": "', '"}')
         listener_id = listener_id.strip()
         if not listener_id:
             return None
@@ -93,7 +93,7 @@ class LoadbalancerClient():
                   + " --lb-algorithm " + lb_algorithmt + " -f json"
         command = self._neutronInsertAuth(command)
         pool_id = subprocess.check_output(command, shell=True)
-        pool_id = common.getStringWithLBRB(pool_id, '{"Field": "id", "Value": "', '"}')
+        pool_id = StrTool.getStringWithLBRB(pool_id, '{"Field": "id", "Value": "', '"}')
         pool_id = pool_id.strip()
         if not pool_id:
             return None
@@ -140,7 +140,7 @@ class LoadbalancerClient():
         command = "neutron lbaas-loadbalancer-show " + loadbalancer_id + " -f json"
         command = self._neutronInsertAuth(command)
         tmp_listener_id = subprocess.check_output(command, shell=True)
-        tmp_listener_id = common.getStringWithLBRB(tmp_listener_id, '{"Field": "listeners", "Value": "{\\\\"id\\\\": \\\\"', '\\\\"}')
+        tmp_listener_id = StrTool.getStringWithLBRB(tmp_listener_id, '{"Field": "listeners", "Value": "{\\\\"id\\\\": \\\\"', '\\\\"}')
         listener_id = tmp_listener_id.strip()
         if not listener_id:
             return None
@@ -155,7 +155,7 @@ class LoadbalancerClient():
         command = "neutron lbaas-listener-show " + listener_id + " -f json"
         command = self._neutronInsertAuth(command)
         tmp_pool_id = subprocess.check_output(command, shell=True)
-        tmp_pool_id = common.getStringWithLBRB(tmp_pool_id, '{"Field": "default_pool_id", "Value": "', '"}')
+        tmp_pool_id = StrTool.getStringWithLBRB(tmp_pool_id, '{"Field": "default_pool_id", "Value": "', '"}')
         pool_id = tmp_pool_id.strip()
         if not pool_id:
             return None
@@ -170,7 +170,7 @@ class LoadbalancerClient():
         command = "neutron lbaas-pool-show " + pool_id + " -f json"
         command = self._neutronInsertAuth(command)
         tmp_healthmonitor_id = subprocess.check_output(command, shell=True)
-        tmp_healthmonitor_id = common.getStringWithLBRB(tmp_healthmonitor_id, '{"Field": "healthmonitor_id", "Value": "', '"}')
+        tmp_healthmonitor_id = StrTool.getStringWithLBRB(tmp_healthmonitor_id, '{"Field": "healthmonitor_id", "Value": "', '"}')
         healthmonitor_id = tmp_healthmonitor_id.strip()
         if not healthmonitor_id:
             return None
@@ -185,7 +185,7 @@ class LoadbalancerClient():
         command = "neutron lbaas-pool-show " + pool_id + " -f json"
         command = self._neutronInsertAuth(command)
         tmp_member_ids = subprocess.check_output(command, shell=True)
-        tmp_member_ids = common.getStringWithLBRB(tmp_member_ids, '{"Field": "members", "Value": "', '"}')
+        tmp_member_ids = StrTool.getStringWithLBRB(tmp_member_ids, '{"Field": "members", "Value": "', '"}')
         member_ids=[]
         if not tmp_member_ids.strip():
             return member_ids

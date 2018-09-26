@@ -1,6 +1,6 @@
 #!-*- coding:utf8 -*-
 
-class Account():
+class Account:
     def __init__(self):
         self.os_tenant_name=None
         self.os_project_name=None

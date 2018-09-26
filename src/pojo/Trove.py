@@ -1,6 +1,6 @@
 #!-*- coding:utf8 -*-
 
-class Trove():
+class Trove:
     def __init__(self):
         self.name=None
         self.id=None

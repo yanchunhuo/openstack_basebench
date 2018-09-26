@@ -1,11 +1,12 @@
 #!-*- coding:utf8 -*-
-from src import common
+from src.authTool import AuthTool
 from src.timeoutThread.checkVolumeCreateSucc import CheckVolumeCreateSucc
 from src.timeoutThread.checkAllVolumeDel import CheckAllVolumeDel
 import subprocess
 
-class CinderClient():
+class CinderClient:
     def __init__(self,os_tenant_name,os_project_name,os_username,os_password):
+        self._authTool=AuthTool()
         self._os_tenant_name=os_tenant_name
         self._os_project_name=os_project_name
         self._os_username=os_username
@@ -17,7 +18,7 @@ class CinderClient():
         :param command:
         :return:
         """
-        return common.novaInsertAuth(command, self._os_tenant_name, self._os_project_name, self._os_username,self._os_password)
+        return self._authTool.cinderInsertAuth(command,self._os_tenant_name,self._os_project_name, self._os_username,self._os_password)
 
     def getVolumeTypeId(self,volume_type_name):
         """
@@ -32,6 +33,20 @@ class CinderClient():
         if not volume_type_id:
             return None
         return volume_type_id
+
+    def getVolumeId(self,volume_name):
+        """
+        获得磁盘id
+        :param volume_name:
+        :return:volume_id
+        """
+        command = "cinder list --all-tenant 1|grep -i " + volume_name + "|awk -F '|' '{print $2}'"
+        command = self._cinderInertAuth(command)
+        volume_id = subprocess.check_output(command, shell=True)
+        volume_id = volume_id.strip()
+        if not volume_id:
+            return None
+        return volume_id
 
     def createVolume(self,volume_name,volume_type_id,volume_size):
         """

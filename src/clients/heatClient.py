@@ -1,22 +1,24 @@
 #!-*- coding:utf8 -*-
 import subprocess
-from src import common
-from src.logger import logger
-from src.timeoutThread.checkAllHeatRunSucc import CheckAllHeatRunSucc
-from src.timeoutThread.checkAllHeatDel import CheckAllHeatDel
-from heat_template import *
 
-class HeatClient():
+from src.authTool import AuthTool
+from src.timeoutThread.checkAllHeatDel import CheckAllHeatDel
+from src.timeoutThread.checkAllHeatRunSucc import CheckAllHeatRunSucc
+
+
+class HeatClient:
     def __init__(self,os_tenant_name,os_project_name,os_username,os_password):
+        self._authTool = AuthTool()
         self._os_tenant_name = os_tenant_name
         self._os_project_name = os_project_name
         self._os_username = os_username
         self._os_password = os_password
 
     def _heatInsertAuth(self,commad):
-        return common.heatInsertAuth(commad,self._os_tenant_name,self._os_project_name,self._os_username,self._os_password)
+        return self._authTool.heatInsertAuth(commad,self._os_tenant_name,self._os_project_name,self._os_username,self._os_password)
 
-    def _dealTemplateFiles(self,net_id,net_CIDR,image_id,image_name,flavor_id,flavor_type_name,passwd,secGroup_id,max_computes,min_computes,alarm_type,max_alarmvalue,min_alarmvalue):
+    @staticmethod
+    def _dealTemplateFiles(net_id, net_CIDR, image_id, image_name, flavor_id, flavor_type_name, passwd, secGroup_id, max_computes, min_computes, alarm_type, max_alarmvalue, min_alarmvalue):
         """
         处理伸缩组2个模板
         :param net_id:
@@ -77,7 +79,6 @@ class HeatClient():
         :param heat_name:
         :return:
         """
-        logger.info('创建一个自动伸缩组'+ heat_name)
         self._dealTemplateFiles(net_id,
                                 net_CIDR,
                                 image_id,
@@ -97,12 +98,10 @@ class HeatClient():
             heat_id = subprocess.check_output(commad, shell=True)
             heat_id = heat_id.strip()
             if not heat_id:
-                logger.error('创建一个自动伸缩组' + heat_name + '失败')
                 return None
             self._is_heat_run_succ(heat_id)
             return heat_id
-        except Exception,e:
-            logger.error('创建一个自动伸缩组'+ heat_name + '失败'+'\r\n'+e.message)
+        except Exception:
             return None
 
 
@@ -112,7 +111,6 @@ class HeatClient():
         :param heat_id:
         :return:
         """
-        logger.info('检测伸缩组'+ heat_id + '运行状态...')
         commad = "heat stack-list| grep -i "+ heat_id + "| awk -F '|' '{print $4}'"
         commad = self._heatInsertAuth(commad)
         checkHeatRunSucc = CheckAllHeatRunSucc(heat_id,commad)
@@ -120,7 +118,6 @@ class HeatClient():
         checkHeatRunSucc.join(60)
         is_succ = checkHeatRunSucc.getIsSucc()
         if not is_succ:
-            logger.error('伸缩组' + heat_id +'60s未处于运行状态')
             checkHeatRunSucc.setIsSucc(True)
         elif is_succ:
             return True
@@ -132,7 +129,6 @@ class HeatClient():
         :param heat_ids:
         :return:
         """
-        logger.info('删除伸缩组'+ heat_ids.__str__())
         if len(heat_ids) != 0:
             del_commad = "heat stack-delete "
             for id in heat_ids:
@@ -142,8 +138,7 @@ class HeatClient():
                 subprocess.check_output(del_commad,shell=True)
                 self._is_del_all_heat(heat_ids)
                 return True
-            except Exception,e:
-                logger.error("删除伸缩组失败" + heat_ids.__str__() +'\r\n'+e.message)
+            except Exception:
                 return False
 
     def _is_del_all_heat(self,heat_ids):
@@ -152,7 +147,6 @@ class HeatClient():
         :param heat_ids:
         :return:
         """
-        logger.info('检测伸缩组:' + heat_ids.__str__() + '是否已全部删除完成')
         num = len(heat_ids)
         if num != 0:
             has_heat_command = "heat stack-list |grep -E '"
@@ -168,7 +162,6 @@ class HeatClient():
             checkHeatDel.join(1800)
             is_succ = checkHeatDel.getIsSucc()
             if not is_succ:
-                logger.error('删除所有伸缩组'+ heat_ids.__str__() + '1800秒后未完全删除'+ '\r\n')
                 checkHeatDel.setIsSucc(True)
                 return False
             elif is_succ:

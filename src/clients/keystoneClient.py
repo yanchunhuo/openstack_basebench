@@ -1,13 +1,13 @@
 #!-*- coding:utf8 -*-
+from src.authTool import AuthTool
+from src.common.strTool import StrTool
 import subprocess
-from config.config import *
-from  src import common
 
-class KeystoneClient():
+class KeystoneClient:
     def __init__(self):
-        pass
+        self._authTool = AuthTool()
 
-    def createAccount(self, project_name, user_name, password, role_name='TenantAdmin'):
+    def createAccount(self, project_name, user_name, password, role_name='_member_'):
         """
         创建一个账户（创建项目、用户），并关联角色
         :param project_name:
@@ -18,8 +18,8 @@ class KeystoneClient():
         """
         project_id = self._createProjectForAccount(project_name)
         user_id = self._createUserForAccount(user_name, password)
-        command = "openstack role add " + "--user " + user_name + " --project " + project_name + " " + role_name + " -f json"
-        command = common.insertAdminAuth(command)
+        command = "openstack role add " + "--user " + user_name + " --project " + project_name + " " + role_name
+        command = self._authTool.insertAdminAuth(command)
         subprocess.check_output(command, shell=True)
         self._createUserForObjectStore(project_id, project_name)
         self._ActivateAccountQuota(project_id)
@@ -32,10 +32,9 @@ class KeystoneClient():
         :return: project_id
         """
         command = "openstack project create " + project_name + " -f json"
-        command = common.insertAdminAuth(command)
+        command = self._authTool.insertAdminAuth(command)
         tmp_project_id = subprocess.check_output(command, shell=True)
-        tmp_project_id = common.getStringWithLBRB(tmp_project_id, '{"Field": "id", "Value": "', '"}')
-        project_id = tmp_project_id.strip()
+        project_id = StrTool.getStringWithDic(tmp_project_id,"id")
         if not project_id:
             return None
         return project_id
@@ -47,7 +46,7 @@ class KeystoneClient():
         :return: project_id
         """
         command = "openstack project list|grep -i " + project_name + "|awk '{print $2}'"
-        command = common.insertAdminAuth(command)
+        command = self._authTool.insertAdminAuth(command)
         project_id = subprocess.check_output(command, shell=True)
         project_id = project_id.strip()
         if not project_id:
@@ -63,10 +62,9 @@ class KeystoneClient():
         :return: user_id
         """
         command = "openstack user create " + user_name + " --password " + password + " -f json"
-        command = common.insertAdminAuth(command)
+        command = self._authTool.insertAdminAuth(command)
         tmp_user_id = subprocess.check_output(command, shell=True)
-        tmp_user_id = common.getStringWithLBRB(tmp_user_id, '{"Field": "id", "Value": "', '"}')
-        user_id = tmp_user_id.strip()
+        user_id = StrTool.getStringWithDic(tmp_user_id,"id")
         if not user_id:
             return None
         return user_id
@@ -78,14 +76,15 @@ class KeystoneClient():
         :return:
         """
         command = "openstack user list|grep -i " + user_name + "|awk '{print $2}'"
-        command = common.insertAdminAuth(command)
+        command = self._authTool.insertAdminAuth(command)
         user_id = subprocess.check_output(command, shell=True)
         user_id = user_id.strip()
         if not user_id:
             return None
         return user_id
 
-    def _createUserForObjectStore(self, project_id, project_name):
+    @staticmethod
+    def _createUserForObjectStore(project_id, project_name):
         """
         创建对象存储用户，并且生成keys
         :param project_id:
@@ -96,7 +95,8 @@ class KeystoneClient():
         subprocess.check_output(command, shell=True)
         return True
 
-    def _ActivateAccountQuota(self, project_id):
+    @staticmethod
+    def _ActivateAccountQuota(project_id):
         """
         激活账户配额功能
         :param project_id:
@@ -106,7 +106,8 @@ class KeystoneClient():
         subprocess.check_output(command, shell=True)
         return True
 
-    def setObjectStoreQuota(self, objects_size, project_id):
+    @staticmethod
+    def setObjectStoreQuota(objects_size, project_id):
         """
         更新账户对象存储大小
         :param objects_size: 文件总大小，单位字节，范围1-5497558138880
@@ -117,7 +118,8 @@ class KeystoneClient():
         subprocess.check_output(command, shell=True)
         return True
 
-    def setAccountBucketsQuota(self, bucket_size, project_id):
+    @staticmethod
+    def setAccountBucketsQuota(bucket_size, project_id):
         """
         更新账户桶大小
         :param bucket_size: 桶大小，范围1-500
@@ -142,7 +144,7 @@ class KeystoneClient():
         """
         command = "openstack quota set " + project_id + " --cores " + str(cores_size) + " --instances " + str(instances_size) + " --ram " + str(ram_size) \
                   + " --volumes " + str(volumes_size) + " --snapshots " + str(snapshots_size) + " --gigabytes " + str(volumes_snapshots_size)
-        command = common.insertAdminAuth(command)
+        command = self._authTool.insertAdminAuth(command)
         subprocess.check_output(command, shell=True)
         return True
 
@@ -157,9 +159,9 @@ class KeystoneClient():
         :param security_group_size: 安全组，范围1-65535
         :return:
         """
-        command = "neutron quota-update --tenant-id " + project_id + " --floatingip  " + str(floatingip_size) + " --loadbalancer " + str(loadbalancer_size)  + \
-                  " --router " + str(router_size) + " --network  " + str(network_size) + " --security-group " + str(security_group_size)
-        command = common.insertAdminAuth(command)
+        command = "openstack quota set " + "--floating-ips " + str(floatingip_size) + \
+                  " --routers " + str(router_size) + " --networks  " + str(network_size) + " --secgroups " + str(security_group_size)+" "+project_id
+        command = self._authTool.insertAdminAuth(command)
         subprocess.check_output(command, shell=True)
         return True
 
@@ -172,20 +174,29 @@ class KeystoneClient():
         :return:
         """
         command = "glance image-quota-set --snapshot_quota " + str(snapshot_quota_size) + " --image_quotas " + str(image_quotas_size) + " " + project_id
-        command = common.insertAdminAuth(command)
+        command = self._authTool.insertAdminAuth(command)
         subprocess.check_output(command, shell=True)
         return True
 
-    def deleteUser(self, user_id, project_id):
+    def deleteAccount(self, user_id, project_id):
         """
         删除用户
         :param user_id:
         :param project_id:
         :return:
         """
-        command = "openstack user delete " + user_id
-        command = common.insertAdminAuth(command)
+        self._deleteUser(user_id)
         self._deleteProject(project_id)
+        return True
+
+    def _deleteUser(self, user_id):
+        """
+        删除用户
+        :param user_id:
+        :return
+        """
+        command = "openstack user delete " + user_id
+        command = self._authTool.insertAdminAuth(command)
         subprocess.check_output(command, shell=True)
         return True
 
@@ -196,6 +207,24 @@ class KeystoneClient():
         :return:
         """
         command = "openstack project delete " + project_id
-        command = common.insertAdminAuth(command)
+        command = self._authTool.insertAdminAuth(command)
         subprocess.check_output(command, shell=True)
+        return True
+
+    def delAccount(self,project_ids):
+        """
+        删除用户
+        :param project_ids:
+        :return:
+        """
+        if len(project_ids) != 0:
+            for project_id in project_ids:
+                command = "openstack role assignment list|grep -i " + project_id + "|awk -F '|' '{print $3}'"
+                command = self._authTool.insertAdminAuth(command)
+                tmp_user_ids = subprocess.check_output(command, shell=True)
+                if tmp_user_ids:
+                    user_ids = tmp_user_ids.split()
+                    for user_id in user_ids:
+                        self._deleteUser(user_id)
+                self._deleteProject(project_id)
         return True

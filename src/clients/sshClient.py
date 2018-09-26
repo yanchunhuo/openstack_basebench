@@ -1,11 +1,9 @@
 #!-*- coding:utf8 -*-
 import os
 import paramiko
-from config.config import COMPUTE_USER_NAME
-from config.config import COMPUTE_USER_PASSWORD
 
-class SSHClient():
-    def __init__(self,ip,port=22,username=COMPUTE_USER_NAME,password=COMPUTE_USER_PASSWORD):
+class SSHClient:
+    def __init__(self,ip,port=22,username='root',password='123456..'):
         self._ip=ip
         self._port=port
         self._username=username

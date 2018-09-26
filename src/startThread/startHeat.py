@@ -1,7 +1,6 @@
 #!-*- coding:utf8 -*-
-import threading
-
 from src.testStability.initHeatResource import InitHeatResource
+import threading
 
 class StartHeat(threading.Thread):
     def __init__(self):

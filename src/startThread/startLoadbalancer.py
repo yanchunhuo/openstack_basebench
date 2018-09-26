@@ -1,7 +1,7 @@
 #!-*- coding:utf8 -*-
-import threading
 from src.testStability.testLoadbalancer import TestLoadbalancer
 from src.testStability.initLoadbalancerResource import InitLoadbalancerResource
+import threading
 
 class StartLoadbalancer(threading.Thread):
     def __init__(self):

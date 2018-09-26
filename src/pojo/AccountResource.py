@@ -1,7 +1,7 @@
 #!-*- coding:utf8 -*-
 from src.pojo.Account import Account
 
-class AccountResource():
+class AccountResource:
     def __init__(self):
         self._secgroups=[]
         self._nets=[]

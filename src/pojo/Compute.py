@@ -1,6 +1,6 @@
 #!-*- coding:utf8 -*-
 
-class Compute():
+class Compute:
     def __init__(self):
         self.name=None
         self.id=None

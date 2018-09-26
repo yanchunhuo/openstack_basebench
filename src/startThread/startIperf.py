@@ -1,7 +1,7 @@
 #!-*- coding:utf8 -*-
-import threading
 from src.testStability.testIperf import TestIperf
 from src.testStability.initIperfResource import InitIperfResource
+import threading
 
 class StartIperf(threading.Thread):
     def __init__(self):

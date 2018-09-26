@@ -1,7 +1,7 @@
 #!-*- coding:utf8 -*-
-import threading
 from src.testStability.testMemtester import TestMemtester
 from src.testStability.initMemtesterResource import InitMemtesterResource
+import threading
 
 class StartMemtester(threading.Thread):
     def __init__(self):

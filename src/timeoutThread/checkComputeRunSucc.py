@@ -16,7 +16,7 @@ class CheckComputeRunSucc(threading.Thread):
             time.sleep(0.5)
             tmp_result= subprocess.check_output(self._command, shell=True)
             tmp_result=tmp_result.strip()
-            if tmp_result=='Running':
+            if tmp_result=='ACTIVE':
                 self._is_succ=True
 
     def setIsSucc(self,is_succ):

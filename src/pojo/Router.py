@@ -1,10 +1,12 @@
 #!-*- coding:utf8 -*-
 
-class Router():
+class Router:
     def __init__(self):
         self.id=None
         self.name=None
         self.gw=None
+        # 路由器端口
+        self.subnet_ids=[]
 
     @property
     def name(self):
@@ -29,3 +31,9 @@ class Router():
     @gw.setter
     def gw(self,gw):
         self.gw=gw
+
+    def add_subnet_id(self,subnet_id):
+        self.subnet_ids.append(subnet_id)
+
+    def get_subnet_ids(self):
+        return self.subnet_ids
