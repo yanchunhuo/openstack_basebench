@@ -77,8 +77,8 @@ class InitHeatResource:
         test_heat_net.cidr = self._test_heat_subnet_cidr
         try:
             test_heat_net.id = self._openstackClient.createNetwork(test_heat_net.name, test_heat_net.cidr)
-        except Exception,e:
-            self._loggers.stabilityHeatLogger.error('初始化网络'+self._router_name+'失败!'+'\r\n'+e.message)
+        except Exception as e:
+            self._loggers.stabilityHeatLogger.error('初始化网络'+self._router_name+'失败!'+'\r\n'+e.args.__str__())
         self._test_heat_net_id = test_heat_net.id
 
         self._loggers.stabilityHeatLogger.info('初始化一个路由器资源，创建名为' + self._router_name + '的路由')
@@ -86,8 +86,8 @@ class InitHeatResource:
         test_router.name=StrTool.addUUID(self._router_name)
         try:
             test_router.id = self._openstackClient.createRouter(test_router.name, self._admin_float_net_id)
-        except Exception,e:
-            self._loggers.stabilityHeatLogger.error('创建路由器'+self._router_name+'失败!'+'\r\n'+e.message)
+        except Exception as e:
+            self._loggers.stabilityHeatLogger.error('创建路由器'+self._router_name+'失败!'+'\r\n'+e.args.__str__())
         self._router_id=test_router.id
         self._loggers.stabilityHeatLogger.info('将heat网络' + self._test_heat_net_name + '绑定到路由器' + self._router_name)
         try:
@@ -95,8 +95,8 @@ class InitHeatResource:
             self._openstackClient.addRouterInterface(self._router_id, test_heat_net_subnet_id)
             test_router.add_subnet_id(test_heat_net_subnet_id)
             test_heat_net.add_subnet_id(test_heat_net_subnet_id)
-        except Exception, e:
-            self._loggers.stabilityHeatLogger.error('将heat网络' + self._test_heat_net_name + '绑定到路由器' + self._router_name + '失败!' + '\r\n' + e.message)
+        except Exception as e:
+            self._loggers.stabilityHeatLogger.error('将heat网络' + self._test_heat_net_name + '绑定到路由器' + self._router_name + '失败!' + '\r\n' + e.args.__str__())
         self._accountResource.add_net(test_heat_net)
         self._accountResource.add_router(test_router)
 
@@ -132,8 +132,8 @@ class InitHeatResource:
                                                       self._min_alarmvalue,
                                                       self._heat_templatepath,
                                                       heatName)
-            except Exception, e:
-                self._loggers.stabilityHeatLogger.info('创建一个伸缩组名为' + test_heat.name + '失败!' + '\r\n' + e.message)
+            except Exception as e:
+                self._loggers.stabilityHeatLogger.info('创建一个伸缩组名为' + test_heat.name + '失败!' + '\r\n' + e.args.__str__())
             self._accountResource.add_heatCompute(test_heat)
 
     def getStabilityheatAccountResource(self):

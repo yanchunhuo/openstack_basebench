@@ -63,6 +63,7 @@
 * 云主机挂载云硬盘时，默认使用/dev/vdc设备，/dev/vdb用于做密码注入
 
 # [编码规范]()
+* 支持python3.x
 * 编写脚本时，名字相关请确保唯一
 * 编写脚本时，python文件开头都不指定解释器
 * 类、方法的注释均写在def下一行，并且用三个双引号形式注释
@@ -78,9 +79,6 @@
 * jmeter 2.13
 
 # [作者]()
-* wangxiurong
-* zhangpingyun
-* limingya
 * yanchunhuo
  
  # [打赏]()

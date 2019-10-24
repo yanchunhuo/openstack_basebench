@@ -81,8 +81,8 @@ class InitLoadbalancerResource:
         test_loadbalancer_net.cidr = self._test_loadbalancer_subnet_cidr
         try:
             test_loadbalancer_net.id=self._openstackClient.createNetwork(self._test_loadbalancer_net_name,self._test_loadbalancer_subnet_cidr)
-        except Exception, e:
-            self._loggers.stabilityLoadbalancerLogger.error('创建loadbalancer网络' + self._test_loadbalancer_net_name + '失败!'+'\r\n'+e.message)
+        except Exception as e:
+            self._loggers.stabilityLoadbalancerLogger.error('创建loadbalancer网络' + self._test_loadbalancer_net_name + '失败!'+'\r\n'+e.args.__str__())
         self._test_loadbalancer_net_id=test_loadbalancer_net.id
 
         self._loggers.stabilityLoadbalancerLogger.info('初始化一个路由器资源，创建名为' + self._router_name + '的路由')
@@ -90,8 +90,8 @@ class InitLoadbalancerResource:
         test_router.name=StrTool.addUUID(self._router_name)
         try:
             test_router.id=self._openstackClient.createRouter(test_router.name,self._admin_float_net_id)
-        except Exception, e:
-            self._loggers.stabilityLoadbalancerLogger.error('创建路由器' + self._router_name + '失败!'+'\r\n'+e.message)
+        except Exception as e:
+            self._loggers.stabilityLoadbalancerLogger.error('创建路由器' + self._router_name + '失败!'+'\r\n'+e.args.__str__())
         self._router_id=test_router.id
         self._loggers.stabilityLoadbalancerLogger.info('将loadbalancer网络' + self._test_loadbalancer_net_name + '绑定到路由器' + self._router_name)
         try:
@@ -99,8 +99,8 @@ class InitLoadbalancerResource:
             self._openstackClient.addRouterInterface(self._router_id,self._test_loadbalancer_net_subnet_id)
             test_router.add_subnet_id(self._test_loadbalancer_net_subnet_id)
             test_loadbalancer_net.add_subnet_id(self._test_loadbalancer_net_subnet_id)
-        except Exception, e:
-            self._loggers.stabilityLoadbalancerLogger.error('将loadbalancer网络' + self._test_loadbalancer_net_name + '绑定到路由器' + self._router_name+'失败!'+'\r\n'+e.message)
+        except Exception as e:
+            self._loggers.stabilityLoadbalancerLogger.error('将loadbalancer网络' + self._test_loadbalancer_net_name + '绑定到路由器' + self._router_name+'失败!'+'\r\n'+e.args.__str__())
         self._accountResource.add_net(test_loadbalancer_net)
         self._accountResource.add_router(test_router)
 
@@ -123,8 +123,8 @@ class InitLoadbalancerResource:
                     member_floatIp.ip = self._openstackClient.getFloatIp(self._admin_float_net_id)
                     member_floatIp.id = self._openstackClient.getFloatId(member_floatIp.ip)
                     self._loggers.stabilityLoadbalancerLogger.info('为后端服务器申请到一个浮动ip:'+member_floatIp.ip)
-                except Exception, e:
-                    self._loggers.stabilityLoadbalancerLogger.error('为后端服务器申请浮动ip失败!'+'\r\n'+e.message)
+                except Exception as e:
+                    self._loggers.stabilityLoadbalancerLogger.error('为后端服务器申请浮动ip失败!'+'\r\n'+e.args.__str__())
                 self._accountResource.add_floatIp(member_floatIp)
 
                 #创建云主机
@@ -139,8 +139,8 @@ class InitLoadbalancerResource:
                                                                  self._default_secgroup_id,
                                                                  random.choice(self._zone_names),
                                                                  self._user_data_path)
-                except Exception, e:
-                    self._loggers.stabilityLoadbalancerLogger.error('启动一台后端服务器'+member_compute.name+'失败!'+'\r\n'+e.message)
+                except Exception as e:
+                    self._loggers.stabilityLoadbalancerLogger.error('启动一台后端服务器'+member_compute.name+'失败!'+'\r\n'+e.args.__str__())
 
                 #绑定浮动ip
                 self._loggers.stabilityLoadbalancerLogger.info('为后端服务器' + member_compute.name + '绑定浮动ip:' + member_floatIp.ip)
@@ -148,8 +148,8 @@ class InitLoadbalancerResource:
                     is_add_succ=self._novaClient.addFloatForCompute(member_compute.id,member_floatIp.ip)
                     if is_add_succ:
                         member_compute.float_ip=member_floatIp.ip
-                except Exception, e:
-                    self._loggers.stabilityLoadbalancerLogger.error('为后端服务器' + member_compute.name + '绑定浮动ip:' + member_floatIp.ip+'失败!'+'\r\n'+e.message)
+                except Exception as e:
+                    self._loggers.stabilityLoadbalancerLogger.error('为后端服务器' + member_compute.name + '绑定浮动ip:' + member_floatIp.ip+'失败!'+'\r\n'+e.args.__str__())
                 test_loadbalancer.add_member(member_compute)
                 self._accountResource.add_compute(member_compute)
                 tmp_member_ip_weight = []
@@ -166,8 +166,8 @@ class InitLoadbalancerResource:
                 loadbalancer_floatIp.ip = self._openstackClient.getFloatIp(self._admin_float_net_id)
                 loadbalancer_floatIp.id = self._openstackClient.getFloatId(loadbalancer_floatIp.ip)
                 self._loggers.stabilityLoadbalancerLogger.info('为负载均衡器申请到一个浮动ip:' + loadbalancer_floatIp.ip)
-            except Exception,e:
-                self._loggers.stabilityLoadbalancerLogger.error('为负载均衡器申请浮动ip失败!'+'\r\n'+e.message)
+            except Exception as e:
+                self._loggers.stabilityLoadbalancerLogger.error('为负载均衡器申请浮动ip失败!'+'\r\n'+e.args.__str__())
             self._accountResource.add_floatIp(loadbalancer_floatIp)
             #启动负载均衡器
             try:
@@ -183,8 +183,8 @@ class InitLoadbalancerResource:
                                                                                    self._readConfig.executeTest.stability_test_loadbalancer_timeout,
                                                                                    self._readConfig.executeTest.stability_test_loadbalancer_protocol_type,
                                                                                    member_ips_weight)
-            except Exception,e:
-                self._loggers.stabilityLoadbalancerLogger.error('启动负载均衡器'+test_loadbalancer.name+'失败!'+'\r\n'+e.message)
+            except Exception as e:
+                self._loggers.stabilityLoadbalancerLogger.error('启动负载均衡器'+test_loadbalancer.name+'失败!'+'\r\n'+e.args.__str__())
             if test_loadbalancer.id:
                 test_loadbalancer.virtual_ip = loadbalancer_floatIp.ip
                 test_loadbalancer.port = self._readConfig.executeTest.stability_test_loadbalancer_protocol_port
@@ -198,8 +198,8 @@ class InitLoadbalancerResource:
                     jmeter_floatIp.ip = self._openstackClient.getFloatIp(self._admin_float_net_id)
                     jmeter_floatIp.id = self._openstackClient.getFloatId(jmeter_floatIp.ip)
                     self._loggers.stabilityLoadbalancerLogger.info('为负载均衡器加压云主机申请到一个浮动ip:'+jmeter_floatIp.ip)
-                except Exception,e:
-                    self._loggers.stabilityLoadbalancerLogger.error('为负载均衡器加压云主机申请浮动ip失败!'+'\r\n'+e.message)
+                except Exception as e:
+                    self._loggers.stabilityLoadbalancerLogger.error('为负载均衡器加压云主机申请浮动ip失败!'+'\r\n'+e.args.__str__())
                 self._accountResource.add_floatIp(jmeter_floatIp)
 
                 # 创建均衡负载器加压的云主机
@@ -214,8 +214,8 @@ class InitLoadbalancerResource:
                                                                    self._default_secgroup_id,
                                                                    random.choice(self._zone_names),
                                                                    self._user_data_path)
-                except Exception, e:
-                    self._loggers.stabilityLoadbalancerLogger.error('启动负载均衡器加压云主机'+jmeter_compute.name+'失败!'+'\r\n'+e.message)
+                except Exception as e:
+                    self._loggers.stabilityLoadbalancerLogger.error('启动负载均衡器加压云主机'+jmeter_compute.name+'失败!'+'\r\n'+e.args.__str__())
                 # 绑定浮动ip
                 self._loggers.stabilityLoadbalancerLogger.info('为负载均衡器加压云主机' + jmeter_compute.name + '绑定浮动ip:' + jmeter_floatIp.ip)
                 try:
@@ -223,8 +223,8 @@ class InitLoadbalancerResource:
                     if is_add_succ:
                         jmeter_compute.float_ip = jmeter_floatIp.ip
                         test_loadbalancer.load_compute = jmeter_compute
-                except Exception, e:
-                    self._loggers.stabilityLoadbalancerLogger.error('为负载均衡器加压云主机' + jmeter_compute.name + '绑定浮动ip:' + jmeter_floatIp.ip + '失败!' + '\r\n' + e.message)
+                except Exception as e:
+                    self._loggers.stabilityLoadbalancerLogger.error('为负载均衡器加压云主机' + jmeter_compute.name + '绑定浮动ip:' + jmeter_floatIp.ip + '失败!' + '\r\n' + e.args.__str__())
                 self._accountResource.add_compute(jmeter_compute)
                 test_loadbalancer.load_compute=jmeter_compute
 

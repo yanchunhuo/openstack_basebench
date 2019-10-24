@@ -3,7 +3,7 @@ from src.pojo.AccountsConfig import AccountsConfig
 from src.pojo.BaseConfig import BaseConfig
 from src.pojo.ExecuteTestConfig import ExcuteTestConfig
 from src.pojo.ToolsConfig import ToolsConfig
-import ConfigParser
+import configparser as ConfigParser
 
 class ReadConfig(object):
     __instance = None

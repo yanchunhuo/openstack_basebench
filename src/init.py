@@ -50,8 +50,8 @@ class Init:
             self._keystoneClient.setAccountNetworkQuota(project_id,100,100,100,100,100)
             self._keystoneClient.setInstanceStorageQuota(project_id,65535,100,1024000,100,100,327675)
             self._keystoneClient.setObjectStoreQuota(5497558138880,project_id)
-        except Exception,e:
-            self._logger.error('创建账号'+self._os_username+'失败!'+'\r\n'+e.message)
+        except Exception as e:
+            self._logger.error('创建账号'+self._os_username+'失败!'+'\r\n'+e.args.__str__())
         self._accountResource.add_account(test_account)
 
         self._logger.info('初始化默认安全组资源'+self._readConfig.base.default_secgroup_name)
@@ -65,8 +65,8 @@ class Init:
             # 将安全组icmp规则放开
             self._logger.info('开放安全组' + default_secgroup.name + '的icmp规则')
             self._openstackClient.addAllowIcmpRule(default_secgroup.id)
-        except Exception,e:
-            self._logger.error('初始化安全组资源'+self._readConfig.base.default_secgroup_name+'失败!'+'\r\n'+e.message)
+        except Exception as e:
+            self._logger.error('初始化安全组资源'+self._readConfig.base.default_secgroup_name+'失败!'+'\r\n'+e.args.__str__())
         self._accountResource.add_secgroup(default_secgroup)
 
         #账户加入外部网络
@@ -75,8 +75,8 @@ class Init:
         admin_float_net.name = self._readConfig.base.admin_float_net_name
         try:
             admin_float_net.id=self._openstackClient.getNetId(self._readConfig.base.admin_float_net_name)
-        except Exception,e:
-            self._logger.error('初始化外部网络'+self._readConfig.base.admin_float_net_name+'资源失败!'+'\r\n'+e.message)
+        except Exception as e:
+            self._logger.error('初始化外部网络'+self._readConfig.base.admin_float_net_name+'资源失败!'+'\r\n'+e.args.__str__())
         self._accountResource.add_adminNet(admin_float_net)
 
         #账户里加入云主机类型
@@ -89,8 +89,8 @@ class Init:
             flavor_type.name=tmp_flavor_type[1]
             try:
                 flavor_type.id=self._novaClient.getFlavorId(flavor_type.name)
-            except Exception, e:
-                self._logger.error('初始化云主机规格资源' + flavor_type_str + '失败!' + '\r\n' + e.message)
+            except Exception as e:
+                self._logger.error('初始化云主机规格资源' + flavor_type_str + '失败!' + '\r\n' + e.args.__str__())
             self._accountResource.add_flavor(flavor_type)
 
         #账户里加入镜像
@@ -99,8 +99,8 @@ class Init:
         test_image.name = self._readConfig.base.test_image_name
         try:
             test_image.id=self._novaClient.getImageId(self._readConfig.base.test_image_name)
-        except Exception,e:
-            self._logger.error('初始化测试镜像资源'+self._readConfig.base.test_image_name+'失败!'+'\r\n'+e.message)
+        except Exception as e:
+            self._logger.error('初始化测试镜像资源'+self._readConfig.base.test_image_name+'失败!'+'\r\n'+e.args.__str__())
         self._accountResource.add_image(test_image)
 
         #账户里加入磁盘类型
@@ -113,8 +113,8 @@ class Init:
             volume_type.name=tmp_volume_type[1]
             try:
                 volume_type.id=self._cinderClient.getVolumeTypeId(volume_type.name)
-            except Exception, e:
-                self._logger.error('初始化磁盘类型资源' + volume_type_str + '失败!' + '\r\n' + e.message)
+            except Exception as e:
+                self._logger.error('初始化磁盘类型资源' + volume_type_str + '失败!' + '\r\n' + e.args.__str__())
             self._accountResource.add_volumeType(volume_type)
 
         #账户里加入可用域

@@ -78,8 +78,8 @@ class InitMemtesterResource:
         test_memtester_net.cidr = self._test_memtester_subnet_cidr
         try:
             test_memtester_net.id = self._openstackClient.createNetwork(test_memtester_net.name, test_memtester_net.cidr)
-        except Exception,e:
-            self._loggers.stabilityMemtesterLogger.error('创建网络'+test_memtester_net.name+'失败!'+'\r\n'+e.message)
+        except Exception as e:
+            self._loggers.stabilityMemtesterLogger.error('创建网络'+test_memtester_net.name+'失败!'+'\r\n'+e.args.__str__())
         self._test_memtester_net_id = test_memtester_net.id
 
         self._loggers.stabilityMemtesterLogger.info('初始化一个路由器资源，创建名为' + self._router_name + '的路由')
@@ -87,8 +87,8 @@ class InitMemtesterResource:
         test_router.name=StrTool.addUUID(self._router_name)
         try:
             test_router.id=self._openstackClient.createRouter(test_router.name,self._admin_float_net_id)
-        except Exception,e:
-            self._loggers.stabilityMemtesterLogger.error('创建路由器'+test_router.name+'失败!'+'\r\n'+e.message)
+        except Exception as e:
+            self._loggers.stabilityMemtesterLogger.error('创建路由器'+test_router.name+'失败!'+'\r\n'+e.args.__str__())
         self._router_id=test_router.id
         self._loggers.stabilityMemtesterLogger.info('将memtester网络' + self._test_memtester_net_name + '绑定到路由器' + self._router_name)
         try:
@@ -96,8 +96,8 @@ class InitMemtesterResource:
             self._openstackClient.addRouterInterface(self._router_id, test_memtester_net_subnet_id)
             test_router.add_subnet_id(test_memtester_net_subnet_id)
             test_memtester_net.add_subnet_id(test_memtester_net_subnet_id)
-        except Exception,e:
-            self._loggers.stabilityMemtesterLogger.error('将memtester网络' + self._test_memtester_net_name + '绑定到路由器' + self._router_name+'失败!'+'\r\n'+e.message)
+        except Exception as e:
+            self._loggers.stabilityMemtesterLogger.error('将memtester网络' + self._test_memtester_net_name + '绑定到路由器' + self._router_name+'失败!'+'\r\n'+e.args.__str__())
         self._accountResource.add_net(test_memtester_net)
         self._accountResource.add_router(test_router)
 
@@ -113,8 +113,8 @@ class InitMemtesterResource:
                 test_floatIp.ip = self._openstackClient.getFloatIp(self._admin_float_net_id)
                 test_floatIp.id=self._openstackClient.getFloatId(test_floatIp.ip)
                 self._loggers.stabilityMemtesterLogger.info('申请到一个浮动ip:' + test_floatIp.ip)
-            except Exception,e:
-                self._loggers.stabilityMemtesterLogger.error('申请浮动ip失败!'+'\r\n'+e.message)
+            except Exception as e:
+                self._loggers.stabilityMemtesterLogger.error('申请浮动ip失败!'+'\r\n'+e.args.__str__())
             self._accountResource.add_floatIp(test_floatIp)
 
             #启动云主机
@@ -130,8 +130,8 @@ class InitMemtesterResource:
                                                              self._default_secgroup_id,
                                                              random.choice(self._zone_names),
                                                              self._user_data_path)
-            except Exception,e:
-                self._loggers.stabilityMemtesterLogger.error('启动云主机'+test_compute.name+'失败!'+'\r\n'+e.message)
+            except Exception as e:
+                self._loggers.stabilityMemtesterLogger.error('启动云主机'+test_compute.name+'失败!'+'\r\n'+e.args.__str__())
 
             #绑定浮动ip
             self._loggers.stabilityMemtesterLogger.info('为云主机' + test_compute.name + '绑定浮动ip:' + test_floatIp.ip)
@@ -139,8 +139,8 @@ class InitMemtesterResource:
                 is_add_succ=self._novaClient.addFloatForCompute(test_compute.id,test_floatIp.ip)
                 if is_add_succ:
                    test_compute.float_ip=test_floatIp.ip
-            except Exception,e:
-                self._loggers.stabilityMemtesterLogger.error('为云主机'+test_compute.name+'绑定浮动ip:'+test_floatIp.ip+'失败!'+'\r\n'+e.message)
+            except Exception as e:
+                self._loggers.stabilityMemtesterLogger.error('为云主机'+test_compute.name+'绑定浮动ip:'+test_floatIp.ip+'失败!'+'\r\n'+e.args.__str__())
             self._accountResource.add_memtesterCompute(test_compute)
             self._accountResource.add_compute(test_compute)
 

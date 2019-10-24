@@ -81,8 +81,8 @@ class InitFioResource:
         fio_test_net.cidr = self._fio_subnet_cidr
         try:
             fio_test_net.id = self._openstackClient.createNetwork(fio_test_net.name,fio_test_net.cidr)
-        except Exception,e:
-            self._loggers.stabilityFioLogger.error('创建网络'+fio_test_net.name+'失败!'+'\r\n'+e.message)
+        except Exception as e:
+            self._loggers.stabilityFioLogger.error('创建网络'+fio_test_net.name+'失败!'+'\r\n'+e.args.__str__())
         self._fio_net_id = fio_test_net.id
 
         self._loggers.stabilityFioLogger.info('初始化一个路由器资源，创建名为' + self._router_name + '的路由')
@@ -90,8 +90,8 @@ class InitFioResource:
         test_router.name = StrTool.addUUID(self._router_name)
         try:
             test_router.id = self._openstackClient.createRouter(test_router.name, self._admin_float_net_id)
-        except Exception, e:
-            self._loggers.stabilityFioLogger.error('创建路由器' + test_router.name + '失败!' + '\r\n' + e.message)
+        except Exception as e:
+            self._loggers.stabilityFioLogger.error('创建路由器' + test_router.name + '失败!' + '\r\n' +e.args.__str__())
         self._router_id = test_router.id
         self._loggers.stabilityFioLogger.info('将fio网络' + self._fio_net_name + '绑定到路由器' + self._router_name)
         try:
@@ -99,8 +99,8 @@ class InitFioResource:
             self._openstackClient.addRouterInterface(self._router_id,fio_subnet_id)
             test_router.add_subnet_id(fio_subnet_id)
             fio_test_net.add_subnet_id(fio_subnet_id)
-        except Exception,e:
-            self._loggers.stabilityFioLogger.error('将fio网络' + self._fio_net_name+ '绑定到路由器' + self._router_name+'失败!'+'\r\n'+e.message)
+        except Exception as e:
+            self._loggers.stabilityFioLogger.error('将fio网络' + self._fio_net_name+ '绑定到路由器' + self._router_name+'失败!'+'\r\n'+e.args.__str__())
         self._accountResource.add_net(fio_test_net)
         self._accountResource.add_router(test_router)
 
@@ -124,8 +124,8 @@ class InitFioResource:
                         test_volume.type = volume_type_and_num[0]
                         test_volume.size = self._readConfig.executeTest.stability_test_fio_volume_size
                         test_volume.id = self._cinderClient.createVolume(test_volume.name,volumeType_id,test_volume.size)
-                    except Exception,e:
-                        self._loggers.stabilityFioLogger.error('创建云硬盘'+ volumeName +'失败'+'\r\n'+e.message)
+                    except Exception as e:
+                        self._loggers.stabilityFioLogger.error('创建云硬盘'+ volumeName +'失败'+'\r\n'+e.args.__str__())
                     self._accountResource.add_volume(test_volume)
 
                     #申请浮动IP
@@ -133,8 +133,8 @@ class InitFioResource:
                     try:
                         test_floatip.ip = self._openstackClient.getFloatIp(self._admin_float_net_id)
                         test_floatip.id = self._openstackClient.getFloatId(test_floatip.ip)
-                    except Exception,e:
-                        self._loggers.stabilityFioLogger.error('申请浮动ip失败!'+'\r\n'+e.message)
+                    except Exception as e:
+                        self._loggers.stabilityFioLogger.error('申请浮动ip失败!'+'\r\n'+e.args.__str__())
                     self._accountResource.add_floatIp(test_floatip)
 
                     #启动云主机
@@ -149,16 +149,16 @@ class InitFioResource:
                                                                        self._default_secgroup_id,
                                                                        random.choice(self._zone_names),
                                                                        self._user_data_path)
-                    except Exception,e:
-                        self._loggers.stabilityFioLogger.error('启动云主机'+test_compute.name+'失败!'+'\r\n'+e.message)
+                    except Exception as e:
+                        self._loggers.stabilityFioLogger.error('启动云主机'+test_compute.name+'失败!'+'\r\n'+e.args.__str__())
 
                     # 绑定浮动IP
                     try:
                         is_add_succ = self._novaClient.addFloatForCompute(test_compute.id,test_floatip.ip)
                         if is_add_succ:
                             test_compute.float_ip = test_floatip.ip
-                    except Exception,e:
-                        self._loggers.stabilityFioLogger.error('为云主机'+test_compute.name+'绑定浮动ip:'+test_floatip.ip+'失败!'+'\r\n'+e.message)
+                    except Exception as e:
+                        self._loggers.stabilityFioLogger.error('为云主机'+test_compute.name+'绑定浮动ip:'+test_floatip.ip+'失败!'+'\r\n'+e.args.__str__())
 
                     # 挂载云硬盘
                     try:
@@ -166,8 +166,8 @@ class InitFioResource:
                         if is_attach_succ:
                             test_compute.volumeId = test_volume.id
                             test_compute.volumeName = test_volume.name
-                    except Exception,e:
-                        self._loggers.stabilityFioLogger.error('挂载云硬盘失败！'+'\r\n'+e.message)
+                    except Exception as e:
+                        self._loggers.stabilityFioLogger.error('挂载云硬盘失败！'+'\r\n'+e.args.__str__())
 
                     self._accountResource.add_fioCompute(test_compute)
                     self._accountResource.add_compute(test_compute)

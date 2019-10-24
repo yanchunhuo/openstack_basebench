@@ -2,7 +2,7 @@
 from src.authTool import AuthTool
 from src.common.strTool import StrTool
 import subprocess
-import json
+import ujson
 import re
 
 class ObjectStoreClient:
@@ -20,7 +20,7 @@ class ObjectStoreClient:
         getKeys_commad = 'radosgw-admin user info --uid='+ project_id + ' --format=json'
         try:
             tmp_keys = subprocess.check_output(getKeys_commad,shell=True)
-            keys = json.loads(tmp_keys)
+            keys = ujson.loads(tmp_keys)
             keys = keys['keys'][0]
             access_key = keys['access_key']
             secret_key = keys['secret_key']
@@ -41,7 +41,7 @@ class ObjectStoreClient:
         commad = self._authTool.insertAdminAuth(commad)
         try:
             tmp_ip = subprocess.check_output(commad,shell=True)
-            tmp_ip = json.dumps(tmp_ip)
+            tmp_ip = ujson.dumps(tmp_ip)
             ip = StrTool.getStringWithLBRB(tmp_ip,'url\\\\": \\\\"http://','\\\\",','all')
             ip = ip[0].strip()
             if not ip:
@@ -59,7 +59,7 @@ class ObjectStoreClient:
         """
         command = "radosgw-admin bucket stats --uid=" + project_id + " -f json"
         tmp_buckets_name = subprocess.check_output(command, shell=True)
-        tmp_buckets_name = json.loads(tmp_buckets_name)
+        tmp_buckets_name = ujson.loads(tmp_buckets_name)
         for bucketname in tmp_buckets_name:
             bucket_name = bucketname["bucket"]
             del_commad = "radosgw-admin bucket rm --bucket=" + bucket_name + " --purge-objects"
@@ -92,5 +92,5 @@ class ObjectStoreClient:
                 del_bucket_command = "radosgw-admin bucket rm --bucket=" + bucket_name + " --purge-objects"
                 subprocess.check_output(del_bucket_command, shell=True)
         except subprocess.CalledProcessError as err:
-                print "Command Error:", err
+                print("Command Error:", err)
         return True

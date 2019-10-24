@@ -24,4 +24,4 @@ if __name__=='__main__':
     elif testType=='freeStabilityResource':
         testStability.free()
     else :
-        print '测试类型错误,使用-h查看使用说明'
+        print('测试类型错误,使用-h查看使用说明')

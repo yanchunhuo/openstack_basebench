@@ -84,8 +84,8 @@ class InitIperfResource:
         try:
             test_iperf_net1.id=self._openstackClient.createNetwork(self._test_iperf_net1_name,self._test_iperf_subnet1_cidr)
             test_iperf_net2.id = self._openstackClient.createNetwork(self._test_iperf_net2_name, self._test_iperf_subnet2_cidr)
-        except Exception,e:
-            self._loggers.stabilityIperfLogger.error('初始化iperf测试的网络'+self._test_iperf_net1_name+'和'+self._test_iperf_net2_name+'失败!'+'\r\n'+e.message)
+        except Exception as e:
+            self._loggers.stabilityIperfLogger.error('初始化iperf测试的网络'+self._test_iperf_net1_name+'和'+self._test_iperf_net2_name+'失败!'+'\r\n'+e.args.__str__())
         self._test_iperf_net1_id=test_iperf_net1.id
         self._test_iperf_net2_id=test_iperf_net2.id
 
@@ -94,8 +94,8 @@ class InitIperfResource:
         test_router.name=StrTool.addUUID(self._router_name)
         try:
             test_router.id=self._openstackClient.createRouter(test_router.name,self._admin_float_net_id)
-        except Exception,e:
-            self._loggers.stabilityIperfLogger.error('创建路由器'+self._router_name+'失败!'+'\r\n'+e.message)
+        except Exception as e:
+            self._loggers.stabilityIperfLogger.error('创建路由器'+self._router_name+'失败!'+'\r\n'+e.args.__str__())
         self._router_id=test_router.id
         self._loggers.stabilityIperfLogger.info('将iperf网络' + self._test_iperf_net1_name + '绑定到路由器' + self._router_name)
         try:
@@ -103,16 +103,16 @@ class InitIperfResource:
             self._openstackClient.addRouterInterface(self._router_id,test_iperf_net1_subnet_id)
             test_router.add_subnet_id(test_iperf_net1_subnet_id)
             test_iperf_net1.add_subnet_id(test_iperf_net1_subnet_id)
-        except Exception,e:
-            self._loggers.stabilityIperfLogger.error('将iperf网络' + self._test_iperf_net1_name + '绑定到路由器' + self._router_name+'失败!'+e.message)
+        except Exception as e:
+            self._loggers.stabilityIperfLogger.error('将iperf网络' + self._test_iperf_net1_name + '绑定到路由器' + self._router_name+'失败!'+e.args.__str__())
         self._loggers.stabilityIperfLogger.info('将iperf网络' + self._test_iperf_net2_name + '绑定到路由器' + self._router_name)
         try:
             test_iperf_net2_subnet_id = self._openstackClient.getSubNetId(self._test_iperf_net2_id)
             self._openstackClient.addRouterInterface(self._router_id, test_iperf_net2_subnet_id)
             test_router.add_subnet_id(test_iperf_net2_subnet_id)
             test_iperf_net2.add_subnet_id(test_iperf_net2_subnet_id)
-        except Exception,e:
-            self._loggers.stabilityIperfLogger.error('将iperf网络' + self._test_iperf_net2_name + '绑定到路由器' + self._router_name+'失败!'+e.message)
+        except Exception as e:
+            self._loggers.stabilityIperfLogger.error('将iperf网络' + self._test_iperf_net2_name + '绑定到路由器' + self._router_name+'失败!'+e.args.__str__())
         self._accountResource.add_net(test_iperf_net1)
         self._accountResource.add_net(test_iperf_net2)
         self._accountResource.add_router(test_router)
@@ -135,8 +135,8 @@ class InitIperfResource:
                     test_floatIp.ip = self._openstackClient.getFloatIp(self._admin_float_net_id)
                     test_floatIp.id = self._openstackClient.getFloatId(test_floatIp.ip)
                     self._loggers.stabilityIperfLogger.info('申请到一个浮动ip:' + test_floatIp.ip)
-                except Exception,e:
-                    self._loggers.stabilityIperfLogger.error('申请浮动ip失败!'+'\r\n'+e.message)
+                except Exception as e:
+                    self._loggers.stabilityIperfLogger.error('申请浮动ip失败!'+'\r\n'+e.args.__str__())
                 self._accountResource.add_floatIp(test_floatIp)
 
                 zone=None
@@ -170,16 +170,16 @@ class InitIperfResource:
                                                                  zone,
                                                                  self._user_data_path)
                     test_compute.ip = self._novaClient.getComputeIp(test_compute.name)
-                except Exception,e:
-                    self._loggers.stabilityIperfLogger.error('启动云主机'+test_compute.name+'失败!'+'\r\n'+e.message)
+                except Exception as e:
+                    self._loggers.stabilityIperfLogger.error('启动云主机'+test_compute.name+'失败!'+'\r\n'+e.args.__str__())
                 #绑定浮动ip
                 self._loggers.stabilityIperfLogger.info('为云主机' + test_compute.name + '绑定浮动ip:' + test_floatIp.ip)
                 try:
                     is_add_succ=self._novaClient.addFloatForCompute(test_compute.id,test_floatIp.ip)
                     if is_add_succ:
                         test_compute.float_ip=test_floatIp.ip
-                except Exception,e:
-                    self._loggers.stabilityIperfLogger.error('为云主机' + test_compute.name + '绑定浮动ip:' + test_floatIp.ip+'失败!'+'\r\n'+e.message)
+                except Exception as e:
+                    self._loggers.stabilityIperfLogger.error('为云主机' + test_compute.name + '绑定浮动ip:' + test_floatIp.ip+'失败!'+'\r\n'+e.args.__str__())
                 iperf_computePair.append(test_compute)
                 self._accountResource.add_compute(test_compute)
                 #设置一组iperf云主机

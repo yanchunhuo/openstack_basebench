@@ -84,8 +84,8 @@ class InitSysbenchResource:
         test_sysbench_net.cidr = self._test_sysbench_subnet_cidr
         try:
             test_sysbench_net.id=self._openstackClient.createNetwork(self._test_sysbench_net_name,self._test_sysbench_subnet_cidr)
-        except Exception, e:
-            self._loggers.stabilitySysbenchLogger.info('创建网络' + self._test_sysbench_net_name + '失败'+'\r\n'+e.message)
+        except Exception as e:
+            self._loggers.stabilitySysbenchLogger.info('创建网络' + self._test_sysbench_net_name + '失败'+'\r\n'+e.args.__str__())
         self._test_sysbench_net_id=test_sysbench_net.id
 
         self._loggers.stabilitySysbenchLogger.info('初始化一个路由器资源，创建名为' + self._router_name + '的路由')
@@ -93,8 +93,8 @@ class InitSysbenchResource:
         test_router.name = StrTool.addUUID(self._router_name)
         try:
             test_router.id = self._openstackClient.createRouter(test_router.name, self._admin_float_net_id)
-        except Exception, e:
-            self._loggers.stabilitySysbenchLogger.info('创建路由器' + self._router_name + '失败' + '\r\n' + e.message)
+        except Exception as e:
+            self._loggers.stabilitySysbenchLogger.info('创建路由器' + self._router_name + '失败' + '\r\n' + e.args.__str__())
         self._router_id = test_router.id
         self._loggers.stabilitySysbenchLogger.info('将Sysbench网络' + self._test_sysbench_net_name + '绑定到路由器' + self._router_name)
         try:
@@ -102,8 +102,8 @@ class InitSysbenchResource:
             self._openstackClient.addRouterInterface(self._router_id, test_sysbench_net_subnet_id)
             test_router.add_subnet_id(test_sysbench_net_subnet_id)
             test_sysbench_net.add_subnet_id(test_sysbench_net_subnet_id)
-        except Exception, e:
-            self._loggers.stabilitySysbenchLogger.info('将Sysbench网络' + self._test_sysbench_net_name + '绑定到路由器' + self._router_name+ '失败'+'\r\n'+e.message)
+        except Exception as e:
+            self._loggers.stabilitySysbenchLogger.info('将Sysbench网络' + self._test_sysbench_net_name + '绑定到路由器' + self._router_name+ '失败'+'\r\n'+e.args.__str__())
         self._accountResource.add_net(test_sysbench_net)
         self._accountResource.add_router(test_router)
 
@@ -129,8 +129,8 @@ class InitSysbenchResource:
                 test_floatIp.ip = self._openstackClient.getFloatIp(self._admin_float_net_id)
                 test_floatIp.id = self._openstackClient.getFloatId(test_floatIp.ip)
                 self._loggers.stabilitySysbenchLogger.info('申请到一个浮动ip:' + test_floatIp.ip)
-            except Exception, e:
-                self._loggers.stabilitySysbenchLogger.info('申请浮动ip失败:'+'\r\n'+e.message)
+            except Exception as e:
+                self._loggers.stabilitySysbenchLogger.info('申请浮动ip失败:'+'\r\n'+e.args.__str__())
 
             self._accountResource.add_floatIp(test_floatIp)
 
@@ -148,8 +148,8 @@ class InitSysbenchResource:
                                                          self._default_secgroup_id,
                                                          random.choice(self._zone_names),
                                                          self._user_data_path)
-            except Exception, e:
-                self._loggers.stabilitySysbenchLogger.info('启动云主机' + test_compute.name + '失败'+'\r\n'+e.message)
+            except Exception as e:
+                self._loggers.stabilitySysbenchLogger.info('启动云主机' + test_compute.name + '失败'+'\r\n'+e.args.__str__())
 
             #绑定浮动ip
             self._loggers.stabilitySysbenchLogger.info('为云主机' + test_compute.name + '绑定浮动ip:' + test_floatIp.ip)
@@ -157,8 +157,8 @@ class InitSysbenchResource:
                 is_add_succ=self._novaClient.addFloatForCompute(test_compute.id,test_floatIp.ip)
                 if is_add_succ:
                     test_compute.float_ip = test_floatIp.ip
-            except Exception, e:
-                self._loggers.stabilitySysbenchLogger.info('为云主机' + test_compute.name + '绑定浮动ip:' + test_floatIp.ip + '失败'+'\r\n'+e.message)
+            except Exception as e:
+                self._loggers.stabilitySysbenchLogger.info('为云主机' + test_compute.name + '绑定浮动ip:' + test_floatIp.ip + '失败'+'\r\n'+e.args.__str__())
 
             #创建数据库实例
             troveName = StrTool.addUUID('trove' + str(i))
@@ -176,8 +176,8 @@ class InitSysbenchResource:
                                                                random.choice(self._zone_names),
                                                                self._datastore_name,
                                                                self._datastore_version_name)
-            except Exception, e:
-                self._loggers.stabilitySysbenchLogger.info('创建一台数据库实例' + test_trove.name + '失败'+'\r\n'+e.message)
+            except Exception as e:
+                self._loggers.stabilitySysbenchLogger.info('创建一台数据库实例' + test_trove.name + '失败'+'\r\n'+e.args.__str__())
 
             test_trove.ip = self._novaClient.getComputeIp(test_trove.name)
 

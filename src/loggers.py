@@ -1,6 +1,6 @@
 # -*- coding:utf8 -*-
 from src.pojo.LoggersConfig import LoggersConfig
-import ConfigParser
+import configparser as ConfigParser
 import logging.handlers
 
 class Loggers(object):

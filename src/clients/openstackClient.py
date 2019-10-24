@@ -1,6 +1,5 @@
 #!-*- coding:utf8 -*-
 from src.authTool import AuthTool
-from src.common.strTool import StrTool
 import subprocess
 
 class OpenstackClient:

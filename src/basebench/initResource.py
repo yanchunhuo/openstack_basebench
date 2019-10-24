@@ -97,8 +97,8 @@ class InitResource:
         test_fio_net.cidr = self._test_fio_subnet_cidr
         try:
             test_fio_net.id = self._openstackClient.createNetwork(test_fio_net.name, test_fio_net.cidr)
-        except Exception,e:
-            self._loggers.basebenchLogger.error('创建网络'+test_fio_net.name+'失败!'+'\r\n'+e.message)
+        except Exception as e:
+            self._loggers.basebenchLogger.error('创建网络'+test_fio_net.name+'失败!'+'\r\n'+e.args.__str__())
         self._test_fio_net_id = test_fio_net.id
 
         self._loggers.basebenchLogger.info('初始化fio路由器资源，创建名为' + self._test_fio_router_name + '的路由器')
@@ -106,16 +106,16 @@ class InitResource:
         test_fio_router.name=StrTool.addUUID(self._test_fio_router_name)
         try:
             test_fio_router.id=self._openstackClient.createRouter(test_fio_router.name,self._admin_float_net_id)
-        except Exception,e:
-            self._loggers.basebenchLogger.error('初始化fio路由器'+test_fio_router.name+'失败!'+'\r\n'+e.message)
+        except Exception as e:
+            self._loggers.basebenchLogger.error('初始化fio路由器'+test_fio_router.name+'失败!'+'\r\n'+e.args.__str__())
         self._loggers.basebenchLogger.info('将fio网络' + test_fio_net.name + '绑定到路由器' + test_fio_router.name)
         try:
             test_fio_net_subnet_id = self._openstackClient.getSubNetId(self._test_fio_net_id)
             self._openstackClient.addRouterInterface(test_fio_router.id, test_fio_net_subnet_id)
             test_fio_net.add_subnet_id(test_fio_net_subnet_id)
             test_fio_router.add_subnet_id(test_fio_net_subnet_id)
-        except Exception,e:
-            self._loggers.basebenchLogger.error('将fio网络' + test_fio_net.name + '绑定到路由器' + test_fio_router.name +'失败'+'\r\n'+e.message)
+        except Exception as e:
+            self._loggers.basebenchLogger.error('将fio网络' + test_fio_net.name + '绑定到路由器' + test_fio_router.name +'失败'+'\r\n'+e.args.__str__())
         self._accountResource.add_net(test_fio_net)
         self._accountResource.add_router(test_fio_router)
 
@@ -136,8 +136,8 @@ class InitResource:
                 self._loggers.basebenchLogger.info('创建云硬盘'+test_volume.name)
                 try:
                     test_volume.id = self._cinderClient.createVolume(volumeName, volumeType_id, test_volume.size)
-                except Exception,e:
-                    self._loggers.basebenchLogger.error('创建云硬盘'+test_volume.name+'失败!'+'\r\n'+e.message)
+                except Exception as e:
+                    self._loggers.basebenchLogger.error('创建云硬盘'+test_volume.name+'失败!'+'\r\n'+e.args.__str__())
                 self._accountResource.add_volume(test_volume)
 
                 # 申请一个浮动ip
@@ -147,8 +147,8 @@ class InitResource:
                     test_floatIp.ip = self._openstackClient.getFloatIp(self._admin_float_net_id)
                     test_floatIp.id = self._openstackClient.getFloatId(test_floatIp.ip)
                     self._loggers.basebenchLogger.info('申请到一个浮动ip:' + test_floatIp.ip)
-                except Exception,e:
-                    self._loggers.basebenchLogger.error('申请浮动ip失败!'+'\r\n'+e.message)
+                except Exception as e:
+                    self._loggers.basebenchLogger.error('申请浮动ip失败!'+'\r\n'+e.args.__str__())
                 self._accountResource.add_floatIp(test_floatIp)
 
                 # 启动云主机
@@ -164,8 +164,8 @@ class InitResource:
                                                                    self._default_secgroup_id,
                                                                    random.choice(self._zone_names),
                                                                    self._user_data_path)
-                except Exception,e:
-                    self._loggers.basebenchLogger.error('启动云主机'+test_compute.name+'失败!'+'\r\n'+e.message)
+                except Exception as e:
+                    self._loggers.basebenchLogger.error('启动云主机'+test_compute.name+'失败!'+'\r\n'+e.args.__str__())
 
                 # 绑定浮动ip
                 self._loggers.basebenchLogger.info('为云主机'+test_compute.name+'绑定浮动ip:'+test_floatIp.ip)
@@ -173,8 +173,8 @@ class InitResource:
                     is_add_succ = self._novaClient.addFloatForCompute(test_compute.id, test_floatIp.ip)
                     if is_add_succ:
                         test_compute.float_ip = test_floatIp.ip
-                except Exception,e:
-                    self._loggers.basebenchLogger.error('为云主机'+test_compute.name+'绑定浮动ip:'+test_floatIp.ip+'失败!'+'\r\n'+e.message)
+                except Exception as e:
+                    self._loggers.basebenchLogger.error('为云主机'+test_compute.name+'绑定浮动ip:'+test_floatIp.ip+'失败!'+'\r\n'+e.args.__str__())
 
                 # 挂载云硬盘
                 self._loggers.basebenchLogger.info('为云主机'+test_compute.name+'挂载云硬盘'+test_volume.name)
@@ -183,8 +183,8 @@ class InitResource:
                     if is_add_succ:
                         test_compute.volumeName = test_volume.name
                         test_compute.volumeId = test_volume.id
-                except Exception,e:
-                    self._loggers.basebenchLogger.error('为云主机'+test_compute.name+'挂载云硬盘'+test_volume.name+'失败!'+'\r\n'+e.message)
+                except Exception as e:
+                    self._loggers.basebenchLogger.error('为云主机'+test_compute.name+'挂载云硬盘'+test_volume.name+'失败!'+'\r\n'+e.args.__str__())
                 self._accountResource.add_fioCompute(test_compute)
                 self._accountResource.add_compute(test_compute)
 
@@ -199,8 +199,8 @@ class InitResource:
         test_unixbench_net.cidr = self._test_unixbench_subnet_cidr
         try:
             test_unixbench_net.id = self._openstackClient.createNetwork(test_unixbench_net.name, test_unixbench_net.cidr)
-        except Exception,e:
-            self._loggers.basebenchLogger.error('创网络' + self._test_unixbench_net_name + '失败!'+'\r\n'+e.message)
+        except Exception as e:
+            self._loggers.basebenchLogger.error('创网络' + self._test_unixbench_net_name + '失败!'+'\r\n'+e.args.__str__())
         self._unixbench_net_id = test_unixbench_net.id
 
         self._loggers.basebenchLogger.info('初始化unixbench路由器资源，创建名为' + self._test_unixbench_router_name + '的路由器')
@@ -208,16 +208,16 @@ class InitResource:
         test_unixbench_router.name = StrTool.addUUID(self._test_unixbench_router_name)
         try:
             test_unixbench_router.id = self._openstackClient.createRouter(test_unixbench_router.name, self._admin_float_net_id)
-        except Exception, e:
-            self._loggers.basebenchLogger.error('初始化unixbench路由器' + test_unixbench_router.name + '失败!' + '\r\n' + e.message)
+        except Exception as e:
+            self._loggers.basebenchLogger.error('初始化unixbench路由器' + test_unixbench_router.name + '失败!' + '\r\n' + e.args.__str__())
         self._loggers.basebenchLogger.info('将unixbench网络' + test_unixbench_net.name + '绑定到路由器' + test_unixbench_router.name)
         try:
             test_unixbench_net_subnet_id = self._openstackClient.getSubNetId(self._unixbench_net_id)
             self._openstackClient.addRouterInterface(test_unixbench_router.id, test_unixbench_net_subnet_id)
             test_unixbench_router.add_subnet_id(test_unixbench_net_subnet_id)
             test_unixbench_net.add_subnet_id(test_unixbench_net_subnet_id)
-        except Exception, e:
-            self._loggers.basebenchLogger.error('将unixbench网络' + test_unixbench_net.name + '绑定到路由器' + test_unixbench_router.name + '失败' + '\r\n' + e.message)
+        except Exception as e:
+            self._loggers.basebenchLogger.error('将unixbench网络' + test_unixbench_net.name + '绑定到路由器' + test_unixbench_router.name + '失败' + '\r\n' + e.args.__str__())
         self._accountResource.add_net(test_unixbench_net)
         self._accountResource.add_router(test_unixbench_router)
 
@@ -235,8 +235,8 @@ class InitResource:
                 test_unixbench_floatIp.ip = self._openstackClient.getFloatIp(self._admin_float_net_id)
                 test_unixbench_floatIp.id = self._openstackClient.getFloatId(test_unixbench_floatIp.ip)
                 self._loggers.basebenchLogger.info('申请到一个浮动ip:' + test_unixbench_floatIp.ip)
-            except Exception,e:
-                self._loggers.basebenchLogger.error('申请浮动ip失败'+'\r\n'+e.message)
+            except Exception as e:
+                self._loggers.basebenchLogger.error('申请浮动ip失败'+'\r\n'+e.args.__str__())
             self._accountResource.add_floatIp(test_unixbench_floatIp)
 
             # 启动云主机
@@ -252,8 +252,8 @@ class InitResource:
                                                                self._default_secgroup_id,
                                                                random.choice(self._zone_names),
                                                                self._user_data_path)
-            except Exception,e:
-                self._loggers.basebenchLogger.error('启动云主机'+test_unixbench_compute.name+'失败!'+'\r\n'+e.message)
+            except Exception as e:
+                self._loggers.basebenchLogger.error('启动云主机'+test_unixbench_compute.name+'失败!'+'\r\n'+e.args.__str__())
 
             # 绑定浮动ip
             self._loggers.basebenchLogger.info('为云主机' + test_unixbench_compute.name + '绑定浮动ip:' + test_unixbench_floatIp.ip)
@@ -261,8 +261,8 @@ class InitResource:
                 is_add_succ = self._novaClient.addFloatForCompute(test_unixbench_compute.id, test_unixbench_floatIp.ip)
                 if is_add_succ:
                     test_unixbench_compute.float_ip=test_unixbench_floatIp.ip
-            except Exception,e:
-                self._loggers.basebenchLogger.error('为云主机' + test_unixbench_compute.name + '绑定浮动ip:' + test_unixbench_floatIp.ip+'失败!'+'\r\n'+e.message)
+            except Exception as e:
+                self._loggers.basebenchLogger.error('为云主机' + test_unixbench_compute.name + '绑定浮动ip:' + test_unixbench_floatIp.ip+'失败!'+'\r\n'+e.args.__str__())
             self._accountResource.add_unixbenchCompute(test_unixbench_compute)
             self._accountResource.add_compute(test_unixbench_compute)
 
@@ -285,8 +285,8 @@ class InitResource:
         try:
             test_iperf_net1.id=self._openstackClient.createNetwork(self._test_iperf_net1_name,self._test_iperf_subnet1_cidr)
             test_iperf_net2.id = self._openstackClient.createNetwork(self._test_iperf_net2_name, self._test_iperf_subnet2_cidr)
-        except Exception,e:
-            self._loggers.basebenchLogger.error('初始化iperf测试的网络'+self._test_iperf_net1_name+'和'+self._test_iperf_net2_name+'失败!'+'\r\n'+e.message)
+        except Exception as e:
+            self._loggers.basebenchLogger.error('初始化iperf测试的网络'+self._test_iperf_net1_name+'和'+self._test_iperf_net2_name+'失败!'+'\r\n'+e.args.__str__())
         self._test_iperf_net1_id=test_iperf_net1.id
         self._test_iperf_net2_id=test_iperf_net2.id
 
@@ -295,24 +295,24 @@ class InitResource:
         test_iperf_router.name = StrTool.addUUID(self._test_iperf_router_name)
         try:
             test_iperf_router.id = self._openstackClient.createRouter(test_iperf_router.name, self._admin_float_net_id)
-        except Exception, e:
-            self._loggers.basebenchLogger.error('初始化iperf路由器' + test_iperf_router.name + '失败!' + '\r\n' + e.message)
+        except Exception as e:
+            self._loggers.basebenchLogger.error('初始化iperf路由器' + test_iperf_router.name + '失败!' + '\r\n' + e.args.__str__())
         self._loggers.basebenchLogger.info('将iperf网络' + self._test_iperf_net1_name + '绑定到路由器' + test_iperf_router.name)
         try:
             test_iperf_net1_subnet_id=self._openstackClient.getSubNetId(self._test_iperf_net1_id)
             self._openstackClient.addRouterInterface(test_iperf_router.id,test_iperf_net1_subnet_id)
             test_iperf_router.add_subnet_id(test_iperf_net1_subnet_id)
             test_iperf_net1.add_subnet_id(test_iperf_net1_subnet_id)
-        except Exception,e:
-            self._loggers.basebenchLogger.error('将iperf网络' + self._test_iperf_net1_name + '绑定到路由器' + test_iperf_router.name +'失败!'+'\r\n'+e.message)
+        except Exception as e:
+            self._loggers.basebenchLogger.error('将iperf网络' + self._test_iperf_net1_name + '绑定到路由器' + test_iperf_router.name +'失败!'+'\r\n'+e.args.__str__())
         self._loggers.basebenchLogger.info('将iperf网络' + self._test_iperf_net2_name + '绑定到路由器' + test_iperf_router.name)
         try:
             test_iperf_net2_subnet_id = self._openstackClient.getSubNetId(self._test_iperf_net2_id)
             self._openstackClient.addRouterInterface(test_iperf_router.id, test_iperf_net2_subnet_id)
             test_iperf_router.add_subnet_id(test_iperf_net2_subnet_id)
             test_iperf_net2.add_subnet_id(test_iperf_net2_subnet_id)
-        except Exception,e:
-            self._loggers.basebenchLogger.error('将iperf网络' + self._test_iperf_net2_name + '绑定到路由器' + test_iperf_router.name+'失败!'+'\r\n'+e.message)
+        except Exception as e:
+            self._loggers.basebenchLogger.error('将iperf网络' + self._test_iperf_net2_name + '绑定到路由器' + test_iperf_router.name+'失败!'+'\r\n'+e.args.__str__())
         self._accountResource.add_net(test_iperf_net1)
         self._accountResource.add_net(test_iperf_net2)
         self._accountResource.add_router(test_iperf_router)
@@ -335,8 +335,8 @@ class InitResource:
                     test_floatIp.ip = self._openstackClient.getFloatIp(self._admin_float_net_id)
                     test_floatIp.id = self._openstackClient.getFloatId(test_floatIp.ip)
                     self._loggers.basebenchLogger.info('申请到一个浮动ip:' + test_floatIp.ip)
-                except Exception,e:
-                    self._loggers.basebenchLogger.error('申请浮动ip失败!'+'\r\n'+e.message)
+                except Exception as e:
+                    self._loggers.basebenchLogger.error('申请浮动ip失败!'+'\r\n'+e.args.__str__())
                 self._accountResource.add_floatIp(test_floatIp)
 
                 # tmp_zone=None
@@ -385,8 +385,8 @@ class InitResource:
                                                                  tmp_zone,
                                                                  self._user_data_path)
                     test_compute.ip = self._novaClient.getComputeIp(test_compute.name)
-                except Exception,e:
-                    self._loggers.basebenchLogger.error('启动云主机'+test_compute.name+'失败!'+'\r\n'+e.message)
+                except Exception as e:
+                    self._loggers.basebenchLogger.error('启动云主机'+test_compute.name+'失败!'+'\r\n'+e.args.__str__())
 
                 #绑定浮动ip
                 self._loggers.basebenchLogger.info('为云主机' + test_compute.name + '绑定浮动ip:' + test_floatIp.ip)
@@ -394,8 +394,8 @@ class InitResource:
                     is_add_succ=self._novaClient.addFloatForCompute(test_compute.id,test_floatIp.ip)
                     if is_add_succ:
                         test_compute.float_ip=test_floatIp.ip
-                except Exception,e:
-                    self._loggers.basebenchLogger.error('为云主机' + test_compute.name + '绑定浮动ip:' + test_floatIp.ip+'失败!'+'\r\n'+e.message)
+                except Exception as e:
+                    self._loggers.basebenchLogger.error('为云主机' + test_compute.name + '绑定浮动ip:' + test_floatIp.ip+'失败!'+'\r\n'+e.args.__str__())
                 iperf_computePair.append(test_compute)
                 self._accountResource.add_compute(test_compute)
                 #设置一组iperf云主机

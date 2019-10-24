@@ -73,8 +73,8 @@ class InitObjectStoreResource:
         oss_test_net.cidr = self._oss_subnet_cidr
         try:
             oss_test_net.id = self._openstackClient.createNetwork(oss_test_net.name, oss_test_net.cidr)
-        except Exception,e:
-            self._loggers.stabilityObjstoreLogger.error('创建网络'+oss_test_net.name+'失败!'+'\r\n'+e.message)
+        except Exception as e:
+            self._loggers.stabilityObjstoreLogger.error('创建网络'+oss_test_net.name+'失败!'+'\r\n'+e.args.__str__())
         self._oss_test_net_id = oss_test_net.id
 
         self._loggers.stabilityObjstoreLogger.info('初始化一个路由器资源，创建名为' + self._router_name + '的路由')
@@ -82,8 +82,8 @@ class InitObjectStoreResource:
         test_router.name = StrTool.addUUID(self._router_name)
         try:
             test_router.id = self._openstackClient.createRouter(test_router.name, self._admin_float_net_id)
-        except Exception, e:
-            self._loggers.stabilityObjstoreLogger.error('创建路由器' + test_router.name + '失败!' + '\r\n' + e.message)
+        except Exception as e:
+            self._loggers.stabilityObjstoreLogger.error('创建路由器' + test_router.name + '失败!' + '\r\n' + e.args.__str__())
         self._router_id = test_router.id
         self._loggers.stabilityObjstoreLogger.info('将网络' + self._oss_net_name + '绑定到路由器' + self._router_name)
         try:
@@ -91,8 +91,8 @@ class InitObjectStoreResource:
             self._openstackClient.addRouterInterface(self._router_id, oss_subnet_id)
             test_router.add_subnet_id(oss_subnet_id)
             oss_test_net.add_subnet_id(oss_subnet_id)
-        except Exception,e:
-            self._loggers.stabilityObjstoreLogger.error('将对象存储网络' + self._oss_net_name+ '绑定到路由器' + self._router_name+'失败!'+'\r\n'+e.message)
+        except Exception as e:
+            self._loggers.stabilityObjstoreLogger.error('将对象存储网络' + self._oss_net_name+ '绑定到路由器' + self._router_name+'失败!'+'\r\n'+e.args.__str__())
         self._accountResource.add_net(oss_test_net)
         self._accountResource.add_router(test_router)
 
@@ -105,8 +105,8 @@ class InitObjectStoreResource:
         try:
             test_oss_floatIp.ip = self._openstackClient.getFloatIp(self._admin_float_net_id)
             test_oss_floatIp.id = self._openstackClient.getFloatId(test_oss_floatIp.ip)
-        except Exception,e:
-            self._loggers.stabilityObjstoreLogger.error('申请浮动ip失败!'+'\r\n'+e.message)
+        except Exception as e:
+            self._loggers.stabilityObjstoreLogger.error('申请浮动ip失败!'+'\r\n'+e.args.__str__())
         self._accountResource.add_floatIp(test_oss_floatIp)
 
         #启动云主机
@@ -121,15 +121,15 @@ class InitObjectStoreResource:
                                                                self._default_secgroup_id,
                                                                random.choice(self._zone_names),
                                                                self._user_data_path)
-        except Exception,e:
-            self._loggers.stabilityObjstoreLogger.error('启动云主机'+test_oss_compute.name+'失败!'+'\r\n'+e.message)
+        except Exception as e:
+            self._loggers.stabilityObjstoreLogger.error('启动云主机'+test_oss_compute.name+'失败!'+'\r\n'+e.args.__str__())
         # 绑定浮动ip
         try:
             is_add_succ=self._novaClient.addFloatForCompute(test_oss_compute.id, test_oss_floatIp.ip)
             if is_add_succ:
                 test_oss_compute.float_ip = test_oss_floatIp.ip
-        except Exception,e:
-            self._loggers.stabilityObjstoreLogger.error('为云主机'+test_oss_compute.name+'绑定浮动ip:'+test_oss_floatIp.ip+'失败!'+'\r\n'+e.message)
+        except Exception as e:
+            self._loggers.stabilityObjstoreLogger.error('为云主机'+test_oss_compute.name+'绑定浮动ip:'+test_oss_floatIp.ip+'失败!'+'\r\n'+e.args.__str__())
 
         self._accountResource.add_objectstorageCompute(test_oss_compute)
         self._accountResource.add_compute(test_oss_compute)

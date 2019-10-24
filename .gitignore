@@ -1,0 +1,12 @@
+*.log*
+*.idea*
+*.pyc*
+*.class*
+*.idea*
+*.metadata*
+*output*
+*.iml*
+*nohup.out*
+*uwsgi.pid*
+*.pytest_cache*
+*common/java/lib/java/libs/*

@@ -1,5 +1,5 @@
 #!-*- coding:utf8 -*-
-from readConfig import ReadConfig
+from src.readConfig import ReadConfig
 
 class AuthTool:
 
