@@ -1,2 +1,2 @@
-paramiko==2.4.0
+paramiko==3.4.0
 ujson==1.35
